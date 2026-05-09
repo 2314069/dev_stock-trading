@@ -11,6 +11,15 @@
 
 ### 完了済み
 
+- **`src/` ツリーと依存の初期セットアップ**
+  - `pyproject.toml`（uv + hatchling、Python 3.12）
+  - 主要依存: `langgraph`, `anthropic`, `yfinance`, `pandas`, `pydantic`, `python-dotenv`, `fastapi`, `httpx`
+  - dev 依存: `pytest`, `pytest-asyncio`, `ruff`, `mypy`
+  - ディレクトリ: `src/{llm,agents,data,features,graph,eval,api}` + `tests/`
+  - 各サブモジュールに責務メモ付きの `__init__.py`
+  - `.python-version`, `.gitignore`, `.env.example`
+  - 初回セットアップは `uv sync` で実行
+
 - **SPEC.md v0.3** — 日経先物情報サイトの仕様ドラフト
   - 機能 F-01〜F-09（基本機能 + AI 予測 + ニュース・情報収集）
   - 画面 P-01〜P-15
@@ -35,19 +44,18 @@
 
 ### High（直近）
 
-- [ ] **`src/` ツリーの初期セットアップ**
-  - Python パッケージ初期化（`pyproject.toml`、`.python-version`）
-  - 依存追加: `langgraph`, `anthropic`, `yfinance`, `pandas`, `pydantic`
-  - ディレクトリ作成: `src/llm`, `src/agents`, `src/data`, `src/features`, `src/graph`, `src/eval`, `src/api`
-  - `.gitignore`, `.env.example`
-
 - [ ] **`src/llm/client.py` の抽象実装**（Phase 0 仕様）
   - Claude Code 経由で動かす前提の最小実装
   - Phase 1 で `anthropic.Anthropic()` 直叩きに差し替え可能な I/F 設計
+  - 入出力の型を `pydantic` で定義
 
 - [ ] **F-08 最小エージェント 1 つの実装**
   - 候補: News Analyst（F-09 のセンチメント特徴量を読んで方向性メモを返す）
   - Claude Code 内で動作確認
+
+- [ ] **uv 環境の初回セットアップ**
+  - `uv sync` 実行確認、Python 3.12 のインストール検証
+  - `pre-commit` の導入は任意（後回し可）
 
 ### Medium（短期）
 
@@ -108,6 +116,8 @@
 | 2026-05-08 | `d34e242` | §14.1 LLM 実行・課金フェーズを追加 |
 | 2026-05-08 | `fdc6a98` | F-08 を日経特化に拡張（マルチホライゾン・特徴量 13 カテゴリ） |
 | 2026-05-08 | `7e028af` | STATUS.md を追加（運用開始） |
+| 2026-05-08 | `537cbc6` | STATUS.md コミットハッシュのバックフィル |
+| 2026-05-08 | _このコミット_ | `src/` ツリーと依存（uv + hatchling）の初期セットアップ |
 
 ---
 

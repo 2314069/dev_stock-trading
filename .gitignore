@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Virtual envs
+.venv/
+venv/
+
+# Caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Data (large files / private)
+data/
+*.parquet
+*.feather
+*.h5
+*.csv
+!tests/fixtures/**/*.csv
+
+# Models
+models/
+*.pkl
+*.onnx
+*.bin
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+logs/
