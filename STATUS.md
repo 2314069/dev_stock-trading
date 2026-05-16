@@ -1,6 +1,6 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-08
+最終更新: 2026-05-10
 ブランチ: `claude/nikkei-futures-spec-n8Gi6`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
@@ -19,6 +19,25 @@
   - 各サブモジュールに責務メモ付きの `__init__.py`
   - `.python-version`, `.gitignore`, `.env.example`
   - 初回セットアップは `uv sync` で実行
+
+- **`src/llm/client.py` LLM クライアント抽象（Phase 0/1 切替点）**
+  - SPEC §14.1 のとおり LLM 呼び出しを 1 ファイルに集約
+  - `LLMClient` Protocol + `AnthropicClient`（Stage 1+）+ `StubClient`（Stage 0/テスト用）
+  - Pydantic で `Message` / `CompletionRequest` / `CompletionResult` を定義
+  - `get_client()` ファクトリが `ANTHROPIC_API_KEY` の有無で実装を切替
+  - `parse_json_response()` で ```json``` フェンス・前後の説明文を剥がして JSON 抽出
+  - デフォルトモデル: `claude-sonnet-4-6`
+
+- **`src/agents/news_analyst.py` News Analyst エージェント（F-08 最小エージェント 1 つ目）**
+  - F-09 のニュース + センチメント（`NewsItem`）を入力に方向性メモ（`DirectionalMemo`）を返す
+  - 6 ホライゾン対応（寄付 / 引け / 後場寄り / ナイト寄り・引け / 翌日寄り）
+  - SYSTEM_PROMPT で売買推奨禁止・ハルシネーション抑制・JSON 出力を指示
+  - 入力に存在する見出しからのみ key_drivers を選ぶよう制約
+
+- **テスト**
+  - `tests/test_llm_client.py`: StubClient エコー・カスタム responder・get_client 切替・JSON パース 5 ケース
+  - `tests/test_news_analyst.py`: スタブ経由のメモ生成・JSON フェンス対応・プロンプト内容検証・スキーマ検証エラー
+  - `pyproject.toml` に `pythonpath = ["src"]` を追加（`uv sync` 後に `uv run pytest` で動作する）
 
 - **SPEC.md v0.3** — 日経先物情報サイトの仕様ドラフト
   - 機能 F-01〜F-09（基本機能 + AI 予測 + ニュース・情報収集）
@@ -44,18 +63,21 @@
 
 ### High（直近）
 
-- [ ] **`src/llm/client.py` の抽象実装**（Phase 0 仕様）
-  - Claude Code 経由で動かす前提の最小実装
-  - Phase 1 で `anthropic.Anthropic()` 直叩きに差し替え可能な I/F 設計
-  - 入出力の型を `pydantic` で定義
-
-- [ ] **F-08 最小エージェント 1 つの実装**
-  - 候補: News Analyst（F-09 のセンチメント特徴量を読んで方向性メモを返す）
-  - Claude Code 内で動作確認
-
-- [ ] **uv 環境の初回セットアップ**
-  - `uv sync` 実行確認、Python 3.12 のインストール検証
+- [ ] **uv 環境の初回セットアップ**（未完了）
+  - 現環境に uv / Python 3.12 が PATH 上に無い
+  - `winget install --id=astral-sh.uv` などでインストール後、`uv sync` を実行
+  - その後 `uv run pytest` で `tests/test_llm_client.py` + `tests/test_news_analyst.py` の動作確認
   - `pre-commit` の導入は任意（後回し可）
+
+- [ ] **News Analyst の Claude Code 内動作確認**
+  - `ANTHROPIC_API_KEY` を `.env` に設定し、実 LLM での出力品質を確認
+  - 出力 JSON の安定性（フェンス有無、温度、prefill 要否）を観察し必要に応じて調整
+
+- [ ] **F-08 残りエージェントの実装**
+  - Technical Analyst（テクニカル指標から方向性メモ）
+  - Sentiment Aggregator（複数 News Analyst 出力を集約）
+  - Researcher Bull / Bear（議論型）
+  - Portfolio Manager（最終シナリオ統合）
 
 ### Medium（短期）
 
@@ -118,6 +140,7 @@
 | 2026-05-08 | `7e028af` | STATUS.md を追加（運用開始） |
 | 2026-05-08 | `537cbc6` | STATUS.md コミットハッシュのバックフィル |
 | 2026-05-08 | `4baad00` | `src/` ツリーと依存（uv + hatchling）の初期セットアップ |
+| 2026-05-10 | (未コミット) | `src/llm/client.py` LLM 抽象 + News Analyst + tests |
 
 ---
 
