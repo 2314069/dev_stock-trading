@@ -172,7 +172,7 @@
 | 2026-05-16 | `0e8aad0` | `src/data/{news,jpx,cme,fx}.py` スタブ + tests（4 モジュール）|
 | 2026-05-16 | `677558a` | `uv.lock` を追加（依存バージョン固定）|
 | 2026-05-16 | `fd8a2f1` | Technical Analyst + 共通型 `agents/types.py` + tests |
-| 2026-05-16 | _未定_ | Sentiment Aggregator + tests |
+| 2026-05-16 | `6510871` | Sentiment Aggregator + tests |
 
 ---
 
