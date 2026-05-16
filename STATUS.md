@@ -1,6 +1,6 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-16 (Researcher Bull / Bear 追加)
+最終更新: 2026-05-16 (Portfolio Manager 追加 — F-08 エージェント群完成)
 ブランチ: `claude/plan-next-tasks-G05pb`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
@@ -54,8 +54,16 @@
   - `opposing_memo` があれば相手側の前回主張に**直接反論**するプロンプトに切替（マルチターン議論の素材）
   - マルチターン議論のオーケストレーション自体は `src/graph/` の責務として後回し（各 analyze 関数は純粋シングルショット）
 
+- **`src/agents/portfolio_manager.py` Portfolio Manager エージェント（F-08 最終ノード）**
+  - 入力 `PortfolioRequest`: 上流 `LabeledMemo` 群 + `bull_memo` / `bear_memo`（議論結果を別フィールドで明示）
+  - 出力 `PortfolioPlan`: direction（3 値）/ `DirectionProbabilities`（和 ~1.0 を Pydantic で検証）/ confidence / top_drivers（最大 5）/ scenario / bull_case / bear_case
+  - SPEC §F-08 の最終出力のうち **LLM で生成可能な部分** を担当。予測レンジ・ポイント・類似日は ML モデル側として分離
+  - `horizon` は req から直接埋め、LLM に echo させない設計
+  - プロンプトで「direction は最大確率と整合」「分布の和は 1.0 ±0.01」「入力に無い観点は採用しない」を制約
+
 - **`src/agents/types.py` 共通型**
-  - `DirectionalMemo` / `Horizon` / `LabeledMemo` を集約。News / Technical / Sentiment Aggregator / Researcher / 後続エージェントが同じ出力スキーマで揃う
+  - `Horizon` / `DirectionalMemo` / `LabeledMemo` / `DirectionProbabilities` / `PortfolioPlan` を集約
+  - News / Technical / Sentiment Aggregator / Researcher は `DirectionalMemo`、Portfolio Manager のみ `PortfolioPlan` を返す
   - `news_analyst.py` / `sentiment_aggregator.py` は後方互換のため再エクスポート
 
 - **テスト**
@@ -64,6 +72,7 @@
   - `tests/test_technical_analyst.py`: スタブ経由のメモ生成・JSON フェンス対応・プロンプト要素検証（指標 / シンボル / 直近足）・欠損指標の None 表記・RSI 値域バリデーション
   - `tests/test_sentiment_aggregator.py`: スタブ経由の集約・プロンプトに各 LabeledMemo が並ぶこと・空入力時の挙動・不正 JSON
   - `tests/test_researchers.py`: Bull / Bear の独立スタブ出力・SYSTEM_PROMPT の使い分け（bearish 禁止 / bullish 禁止表現の確認）・opposing_memo のプロンプト埋め込み・初回ターンでの「反論対象なし」表記・各 LabeledMemo の整形・不正 JSON
+  - `tests/test_portfolio_manager.py`: スタブ経由のプラン生成・`horizon` が req 由来で LLM 出力を上書きすること・プロンプトの memos / Bull / Bear 整形・Bull/Bear 未入力時の表記・確率分布の和バリデーション・top_drivers 上限 5・不正 JSON
   - `tests/test_data_news.py` / `test_data_jpx.py` / `test_data_cme.py` / `test_data_fx.py`: 各データ層スタブの IF / フィルタ / デフォルト動作
   - `pyproject.toml` に `pythonpath = ["src"]` を追加（`uv sync` 後に `uv run pytest` で動作する）
 
@@ -113,7 +122,11 @@
   - [x] Technical Analyst（2026-05-16 実装）
   - [x] Sentiment Aggregator（2026-05-16 実装）
   - [x] Researcher Bull / Bear（2026-05-16 実装。議論オーケストレーションは graph 層に後回し）
-  - [ ] Portfolio Manager（最終シナリオ統合）
+  - [x] Portfolio Manager（2026-05-16 実装。F-08 エージェント群が一通り揃った）
+
+- [ ] **オーケストレーション (src/graph/) の LangGraph 実装**
+  - News × N → Sentiment Aggregator → (Technical と並列) → Bull/Bear 議論 (rounds) → Portfolio Manager
+  - 状態管理（中間 memo の蓄積）、ホライゾン別グラフの分岐、エラーリトライ
 
 ### Medium（短期）
 
@@ -182,6 +195,7 @@
 | 2026-05-16 | `fd8a2f1` | Technical Analyst + 共通型 `agents/types.py` + tests |
 | 2026-05-16 | `6510871` | Sentiment Aggregator + tests |
 | 2026-05-16 | `6b0dcbd` | Researcher Bull / Bear + LabeledMemo を types に集約 |
+| 2026-05-16 | _未定_ | Portfolio Manager + `PortfolioPlan` / `DirectionProbabilities` 型追加 |
 
 ---
 

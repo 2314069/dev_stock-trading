@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 Horizon = Literal[
     "open_today",
@@ -48,4 +48,42 @@ class LabeledMemo(BaseModel):
     memo: DirectionalMemo
 
 
-__all__ = ["DirectionalMemo", "Horizon", "LabeledMemo"]
+class DirectionProbabilities(BaseModel):
+    """3 値方向の確率分布。総和が ~1.0 (±0.01) であることを後検証。"""
+
+    bullish: float = Field(ge=0.0, le=1.0)
+    neutral: float = Field(ge=0.0, le=1.0)
+    bearish: float = Field(ge=0.0, le=1.0)
+
+    @model_validator(mode="after")
+    def _validate_sum(self) -> DirectionProbabilities:
+        total = self.bullish + self.neutral + self.bearish
+        if not 0.99 <= total <= 1.01:
+            raise ValueError(f"probabilities must sum to ~1.0, got {total:.4f}")
+        return self
+
+
+class PortfolioPlan(BaseModel):
+    """Portfolio Manager が出力する最終シナリオ。
+
+    SPEC §F-08 のうち LLM で生成可能な部分（方向 / 確率分布 / 信頼度 / 寄与要因 / シナリオ /
+    bull・bear 各論）を担う。予測レンジ・ポイント予測・類似日は ML モデル側の責務として分離。
+    """
+
+    horizon: Horizon
+    direction: Literal["bullish", "neutral", "bearish"]
+    direction_probabilities: DirectionProbabilities
+    confidence: int = Field(ge=0, le=100)
+    top_drivers: list[str] = Field(default_factory=list, max_length=5)
+    scenario: str
+    bull_case: str = ""
+    bear_case: str = ""
+
+
+__all__ = [
+    "DirectionProbabilities",
+    "DirectionalMemo",
+    "Horizon",
+    "LabeledMemo",
+    "PortfolioPlan",
+]
