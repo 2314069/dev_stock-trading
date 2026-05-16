@@ -164,7 +164,7 @@
 | 2026-05-10 | `3440480` | `src/llm/client.py` LLM 抽象 + News Analyst + tests |
 | 2026-05-16 | `0e8aad0` | `src/data/{news,jpx,cme,fx}.py` スタブ + tests（4 モジュール）|
 | 2026-05-16 | `677558a` | `uv.lock` を追加（依存バージョン固定）|
-| 2026-05-16 | _未定_ | Technical Analyst + 共通型 `agents/types.py` + tests |
+| 2026-05-16 | `fd8a2f1` | Technical Analyst + 共通型 `agents/types.py` + tests |
 
 ---
 
