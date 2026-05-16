@@ -195,7 +195,7 @@
 | 2026-05-16 | `fd8a2f1` | Technical Analyst + 共通型 `agents/types.py` + tests |
 | 2026-05-16 | `6510871` | Sentiment Aggregator + tests |
 | 2026-05-16 | `6b0dcbd` | Researcher Bull / Bear + LabeledMemo を types に集約 |
-| 2026-05-16 | _未定_ | Portfolio Manager + `PortfolioPlan` / `DirectionProbabilities` 型追加 |
+| 2026-05-16 | `4fb2dc3` | Portfolio Manager + `PortfolioPlan` / `DirectionProbabilities` 型追加 |
 
 ---
 
