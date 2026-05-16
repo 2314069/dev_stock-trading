@@ -37,4 +37,15 @@ class DirectionalMemo(BaseModel):
     summary: str
 
 
-__all__ = ["DirectionalMemo", "Horizon"]
+class LabeledMemo(BaseModel):
+    """ラベル付きメモ。`label` は出所文脈 (例: "central_bank", "domestic_news", "technical")。
+
+    Sentiment Aggregator / Researcher Bull-Bear など、複数の `DirectionalMemo` を入力に取る
+    エージェントが共通で使う。
+    """
+
+    label: str
+    memo: DirectionalMemo
+
+
+__all__ = ["DirectionalMemo", "Horizon", "LabeledMemo"]

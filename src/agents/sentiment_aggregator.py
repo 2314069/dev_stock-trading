@@ -17,7 +17,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from agents.types import DirectionalMemo, Horizon
+from agents.types import DirectionalMemo, Horizon, LabeledMemo
 from llm.client import (
     CompletionRequest,
     LLMClient,
@@ -25,13 +25,6 @@ from llm.client import (
     get_client,
     parse_json_response,
 )
-
-
-class LabeledMemo(BaseModel):
-    """ラベル付きメモ。`label` は出所文脈の手がかり (例: "central_bank", "domestic_news")。"""
-
-    label: str
-    memo: DirectionalMemo
 
 
 class SentimentAggregationRequest(BaseModel):
