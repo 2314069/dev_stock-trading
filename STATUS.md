@@ -1,6 +1,6 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-16 (Portfolio Manager 追加 — F-08 エージェント群完成)
+最終更新: 2026-05-16 (差替容易性リファクタ — config / LLM runner / Orchestrator Protocol)
 ブランチ: `claude/plan-next-tasks-G05pb`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
@@ -61,6 +61,14 @@
   - `horizon` は req から直接埋め、LLM に echo させない設計
   - プロンプトで「direction は最大確率と整合」「分布の和は 1.0 ±0.01」「入力に無い観点は採用しない」を制約
 
+- **差替容易性リファクタ（2026-05-16）— 技術要素のスイッチを 1 ファイル変更で済むように**
+  - `src/config/` 設定層を新設。`Settings` / `LLMSettings` を pydantic で定義し、環境変数（`LLM_DEFAULT_MODEL` / `LLM_DEFAULT_MAX_TOKENS` / `LLM_DEFAULT_TEMPERATURE`）から上書き可能。`get_settings()` / `set_settings()` / `reset_settings()` でシングルトン管理。`.env` も自動ロード
+  - `src/llm/runner.py` を新設。各エージェントに 5 箇所重複していた LLM 呼出ボイラープレート（CompletionRequest 構築 → complete → JSON パース → Pydantic 検証）を `run_json_agent()` に集約。リトライ・レイテンシ計測・課金記録・プロンプトキャッシュなど横断的関心事を後付けする場所として一元化
+  - `src/llm/client.py` の `DEFAULT_MODEL` 直書きを廃止。`CompletionRequest` の model / max_tokens / temperature は `Field(default_factory=...)` で config から取得し、テストでは `set_settings()` で差替できるようにした
+  - 5 エージェント（News / Technical / Sentiment Aggregator / Researchers / Portfolio Manager）を runner 経由に書き換え。各 `analyze()` は 4 行に短縮。既存テストは無修正で全件パス
+  - `src/graph/orchestrator.py` を新設。`PredictionRequest` + `Orchestrator` Protocol + `StubOrchestrator` + `get_orchestrator()`。LangGraph 実装着手前に IF を確定させ、LangGraph → CrewAI → 自作 への乗換コストを最小化する設計
+  - `pyproject.toml` の wheel packages に `src/config` を追加
+
 - **`src/agents/types.py` 共通型**
   - `Horizon` / `DirectionalMemo` / `LabeledMemo` / `DirectionProbabilities` / `PortfolioPlan` を集約
   - News / Technical / Sentiment Aggregator / Researcher は `DirectionalMemo`、Portfolio Manager のみ `PortfolioPlan` を返す
@@ -73,6 +81,9 @@
   - `tests/test_sentiment_aggregator.py`: スタブ経由の集約・プロンプトに各 LabeledMemo が並ぶこと・空入力時の挙動・不正 JSON
   - `tests/test_researchers.py`: Bull / Bear の独立スタブ出力・SYSTEM_PROMPT の使い分け（bearish 禁止 / bullish 禁止表現の確認）・opposing_memo のプロンプト埋め込み・初回ターンでの「反論対象なし」表記・各 LabeledMemo の整形・不正 JSON
   - `tests/test_portfolio_manager.py`: スタブ経由のプラン生成・`horizon` が req 由来で LLM 出力を上書きすること・プロンプトの memos / Bull / Bear 整形・Bull/Bear 未入力時の表記・確率分布の和バリデーション・top_drivers 上限 5・不正 JSON
+  - `tests/test_config.py`: デフォルト値・シングルトン・set/reset・env 上書き
+  - `tests/test_llm_runner.py`: ランナーの検証 / post_process / 不正 JSON / スキーマ違反 / settings デフォルト・明示 override / system & user の引き渡し
+  - `tests/test_orchestrator.py`: `StubOrchestrator` の既定プラン・canned プランの horizon 上書き・`get_orchestrator()` の戻り型
   - `tests/test_data_news.py` / `test_data_jpx.py` / `test_data_cme.py` / `test_data_fx.py`: 各データ層スタブの IF / フィルタ / デフォルト動作
   - `pyproject.toml` に `pythonpath = ["src"]` を追加（`uv sync` 後に `uv run pytest` で動作する）
 
@@ -125,6 +136,8 @@
   - [x] Portfolio Manager（2026-05-16 実装。F-08 エージェント群が一通り揃った）
 
 - [ ] **オーケストレーション (src/graph/) の LangGraph 実装**
+  - IF は `graph/orchestrator.py` の `Orchestrator` Protocol で固定済み
+  - 具象実装 (`graph/langgraph_impl.py` など) を追加し、`get_orchestrator()` で差替
   - News × N → Sentiment Aggregator → (Technical と並列) → Bull/Bear 議論 (rounds) → Portfolio Manager
   - 状態管理（中間 memo の蓄積）、ホライゾン別グラフの分岐、エラーリトライ
 
@@ -196,6 +209,7 @@
 | 2026-05-16 | `6510871` | Sentiment Aggregator + tests |
 | 2026-05-16 | `6b0dcbd` | Researcher Bull / Bear + LabeledMemo を types に集約 |
 | 2026-05-16 | `4fb2dc3` | Portfolio Manager + `PortfolioPlan` / `DirectionProbabilities` 型追加 |
+| 2026-05-16 | _未定_ | 差替容易性リファクタ: `src/config/` + `llm/runner.py` + `graph/orchestrator.py` Protocol |
 
 ---
 

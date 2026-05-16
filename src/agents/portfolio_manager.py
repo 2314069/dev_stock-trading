@@ -21,13 +21,8 @@ from agents.types import (
     LabeledMemo,
     PortfolioPlan,
 )
-from llm.client import (
-    CompletionRequest,
-    LLMClient,
-    Message,
-    get_client,
-    parse_json_response,
-)
+from llm.client import LLMClient
+from llm.runner import run_json_agent
 
 
 class PortfolioRequest(BaseModel):
@@ -120,19 +115,15 @@ def synthesize(
 
     `horizon` は呼び出し側既知の情報のため LLM には echo させず、req から直接埋める。
     """
-    client = client or get_client()
-    completion_kwargs: dict[str, object] = {
-        "system": SYSTEM_PROMPT,
-        "messages": [Message(role="user", content=_build_user_message(req))],
-        "max_tokens": 1536,
-        "temperature": 0.0,
-    }
-    if model is not None:
-        completion_kwargs["model"] = model
-    result = client.complete(CompletionRequest(**completion_kwargs))  # type: ignore[arg-type]
-    payload = parse_json_response(result.content)
-    payload["horizon"] = req.horizon
-    return PortfolioPlan.model_validate(payload)
+    return run_json_agent(
+        system=SYSTEM_PROMPT,
+        user=_build_user_message(req),
+        schema=PortfolioPlan,
+        client=client,
+        model=model,
+        max_tokens=1536,
+        post_process=lambda payload: {**payload, "horizon": req.horizon},
+    )
 
 
 __all__ = [

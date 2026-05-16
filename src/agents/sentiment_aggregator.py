@@ -18,13 +18,8 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 from agents.types import DirectionalMemo, Horizon, LabeledMemo
-from llm.client import (
-    CompletionRequest,
-    LLMClient,
-    Message,
-    get_client,
-    parse_json_response,
-)
+from llm.client import LLMClient
+from llm.runner import run_json_agent
 
 
 class SentimentAggregationRequest(BaseModel):
@@ -94,18 +89,14 @@ def analyze(
     model: str | None = None,
 ) -> DirectionalMemo:
     """Sentiment Aggregator を 1 回実行する。"""
-    client = client or get_client()
-    completion_kwargs: dict[str, object] = {
-        "system": SYSTEM_PROMPT,
-        "messages": [Message(role="user", content=_build_user_message(req))],
-        "max_tokens": 1024,
-        "temperature": 0.0,
-    }
-    if model is not None:
-        completion_kwargs["model"] = model
-    result = client.complete(CompletionRequest(**completion_kwargs))  # type: ignore[arg-type]
-    payload = parse_json_response(result.content)
-    return DirectionalMemo.model_validate(payload)
+    return run_json_agent(
+        system=SYSTEM_PROMPT,
+        user=_build_user_message(req),
+        schema=DirectionalMemo,
+        client=client,
+        model=model,
+        max_tokens=1024,
+    )
 
 
 __all__ = [
