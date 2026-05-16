@@ -209,7 +209,7 @@
 | 2026-05-16 | `6510871` | Sentiment Aggregator + tests |
 | 2026-05-16 | `6b0dcbd` | Researcher Bull / Bear + LabeledMemo を types に集約 |
 | 2026-05-16 | `4fb2dc3` | Portfolio Manager + `PortfolioPlan` / `DirectionProbabilities` 型追加 |
-| 2026-05-16 | _未定_ | 差替容易性リファクタ: `src/config/` + `llm/runner.py` + `graph/orchestrator.py` Protocol |
+| 2026-05-16 | `89e1090` | 差替容易性リファクタ: `src/config/` + `llm/runner.py` + `graph/orchestrator.py` Protocol |
 
 ---
 
