@@ -1,6 +1,6 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-16 (Technical Analyst 追加)
+最終更新: 2026-05-16 (Sentiment Aggregator 追加)
 ブランチ: `claude/plan-next-tasks-G05pb`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
@@ -41,14 +41,21 @@
   - 欠損 (None) 指標はプロンプト上で明示し、判断材料に使わせない
   - ホライゾン別の重み付け方針をプロンプトに明記（寄付前はオーバーナイト系、引け予測は日中モメンタム系を重視）
 
+- **`src/agents/sentiment_aggregator.py` Sentiment Aggregator エージェント（F-08 3 つ目）**
+  - 複数の `DirectionalMemo`（カテゴリ別 / ソース別 News Analyst 出力など）を `LabeledMemo` 経由で受け取り 1 つに集約
+  - 集約は LLM ベース。confidence と label（"central_bank" / "official" / "exchange" 等は重み高め）で加重判断
+  - 方向が割れる場合は乖離をそのまま summary に記述（無理に統合しない）
+  - 出力は同じ `DirectionalMemo`。Portfolio Manager から見ると個別 Analyst と同列のシグナル源
+
 - **`src/agents/types.py` 共通型**
-  - `DirectionalMemo` と `Horizon` を切り出し。News / Technical / 後続エージェントが同じ出力スキーマで揃う
+  - `DirectionalMemo` と `Horizon` を切り出し。News / Technical / Sentiment Aggregator / 後続エージェントが同じ出力スキーマで揃う
   - `news_analyst.py` は後方互換のため再エクスポート
 
 - **テスト**
   - `tests/test_llm_client.py`: StubClient エコー・カスタム responder・get_client 切替・JSON パース 5 ケース
   - `tests/test_news_analyst.py`: スタブ経由のメモ生成・JSON フェンス対応・プロンプト内容検証・スキーマ検証エラー
   - `tests/test_technical_analyst.py`: スタブ経由のメモ生成・JSON フェンス対応・プロンプト要素検証（指標 / シンボル / 直近足）・欠損指標の None 表記・RSI 値域バリデーション
+  - `tests/test_sentiment_aggregator.py`: スタブ経由の集約・プロンプトに各 LabeledMemo が並ぶこと・空入力時の挙動・不正 JSON
   - `tests/test_data_news.py` / `test_data_jpx.py` / `test_data_cme.py` / `test_data_fx.py`: 各データ層スタブの IF / フィルタ / デフォルト動作
   - `pyproject.toml` に `pythonpath = ["src"]` を追加（`uv sync` 後に `uv run pytest` で動作する）
 
@@ -96,7 +103,7 @@
 
 - [ ] **F-08 残りエージェントの実装**
   - [x] Technical Analyst（2026-05-16 実装）
-  - [ ] Sentiment Aggregator（複数 News Analyst 出力を集約）
+  - [x] Sentiment Aggregator（2026-05-16 実装）
   - [ ] Researcher Bull / Bear（議論型）
   - [ ] Portfolio Manager（最終シナリオ統合）
 
@@ -165,6 +172,7 @@
 | 2026-05-16 | `0e8aad0` | `src/data/{news,jpx,cme,fx}.py` スタブ + tests（4 モジュール）|
 | 2026-05-16 | `677558a` | `uv.lock` を追加（依存バージョン固定）|
 | 2026-05-16 | `fd8a2f1` | Technical Analyst + 共通型 `agents/types.py` + tests |
+| 2026-05-16 | _未定_ | Sentiment Aggregator + tests |
 
 ---
 
