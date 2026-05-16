@@ -1,6 +1,6 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-16
+最終更新: 2026-05-16 (Technical Analyst 追加)
 ブランチ: `claude/plan-next-tasks-G05pb`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
@@ -34,9 +34,21 @@
   - SYSTEM_PROMPT で売買推奨禁止・ハルシネーション抑制・JSON 出力を指示
   - 入力に存在する見出しからのみ key_drivers を選ぶよう制約
 
+- **`src/agents/technical_analyst.py` Technical Analyst エージェント（F-08 2 つ目）**
+  - SPEC §F-08 (a)(b)(k) のテクニカル指標スナップショット (`TechnicalIndicators`) を入力に方向性メモを返す
+  - 主要指標: SMA(5/25/75/200)、RSI(14)、MACD、Bollinger Width、ATR(14)、一目均衡表雲との位置、オーバーナイトリターン
+  - 任意で直近足 (`FuturesBar`) をコンテキストとして渡せる
+  - 欠損 (None) 指標はプロンプト上で明示し、判断材料に使わせない
+  - ホライゾン別の重み付け方針をプロンプトに明記（寄付前はオーバーナイト系、引け予測は日中モメンタム系を重視）
+
+- **`src/agents/types.py` 共通型**
+  - `DirectionalMemo` と `Horizon` を切り出し。News / Technical / 後続エージェントが同じ出力スキーマで揃う
+  - `news_analyst.py` は後方互換のため再エクスポート
+
 - **テスト**
   - `tests/test_llm_client.py`: StubClient エコー・カスタム responder・get_client 切替・JSON パース 5 ケース
   - `tests/test_news_analyst.py`: スタブ経由のメモ生成・JSON フェンス対応・プロンプト内容検証・スキーマ検証エラー
+  - `tests/test_technical_analyst.py`: スタブ経由のメモ生成・JSON フェンス対応・プロンプト要素検証（指標 / シンボル / 直近足）・欠損指標の None 表記・RSI 値域バリデーション
   - `tests/test_data_news.py` / `test_data_jpx.py` / `test_data_cme.py` / `test_data_fx.py`: 各データ層スタブの IF / フィルタ / デフォルト動作
   - `pyproject.toml` に `pythonpath = ["src"]` を追加（`uv sync` 後に `uv run pytest` で動作する）
 
@@ -83,10 +95,10 @@
   - 出力 JSON の安定性（フェンス有無、温度、prefill 要否）を観察し必要に応じて調整
 
 - [ ] **F-08 残りエージェントの実装**
-  - Technical Analyst（テクニカル指標から方向性メモ）
-  - Sentiment Aggregator（複数 News Analyst 出力を集約）
-  - Researcher Bull / Bear（議論型）
-  - Portfolio Manager（最終シナリオ統合）
+  - [x] Technical Analyst（2026-05-16 実装）
+  - [ ] Sentiment Aggregator（複数 News Analyst 出力を集約）
+  - [ ] Researcher Bull / Bear（議論型）
+  - [ ] Portfolio Manager（最終シナリオ統合）
 
 ### Medium（短期）
 
@@ -151,6 +163,8 @@
 | 2026-05-08 | `4baad00` | `src/` ツリーと依存（uv + hatchling）の初期セットアップ |
 | 2026-05-10 | `3440480` | `src/llm/client.py` LLM 抽象 + News Analyst + tests |
 | 2026-05-16 | `0e8aad0` | `src/data/{news,jpx,cme,fx}.py` スタブ + tests（4 モジュール）|
+| 2026-05-16 | `677558a` | `uv.lock` を追加（依存バージョン固定）|
+| 2026-05-16 | _未定_ | Technical Analyst + 共通型 `agents/types.py` + tests |
 
 ---
 

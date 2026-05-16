@@ -12,10 +12,10 @@ F-08 の他エージェント (Technical / Sentiment / Researcher Bull-Bear / Po
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
+from agents.types import DirectionalMemo, Horizon
 from data.news import Impact, NewsItem
 from llm.client import (
     CompletionRequest,
@@ -25,29 +25,11 @@ from llm.client import (
     parse_json_response,
 )
 
-Horizon = Literal[
-    "open_today",
-    "close_today",
-    "afternoon_open",
-    "night_open",
-    "night_close",
-    "next_open",
-]
-
 
 class NewsAnalysisRequest(BaseModel):
     horizon: Horizon
     as_of: datetime
     news: list[NewsItem]
-
-
-class DirectionalMemo(BaseModel):
-    """News Analyst の出力。F-08 のアンサンブル入力 / 寄与要因表示で消費される。"""
-
-    direction: Literal["bullish", "neutral", "bearish"]
-    confidence: int = Field(ge=0, le=100)
-    key_drivers: list[str] = Field(default_factory=list)
-    summary: str
 
 
 SYSTEM_PROMPT = """\
