@@ -140,7 +140,7 @@
 | 2026-05-08 | `7e028af` | STATUS.md を追加（運用開始） |
 | 2026-05-08 | `537cbc6` | STATUS.md コミットハッシュのバックフィル |
 | 2026-05-08 | `4baad00` | `src/` ツリーと依存（uv + hatchling）の初期セットアップ |
-| 2026-05-10 | (未コミット) | `src/llm/client.py` LLM 抽象 + News Analyst + tests |
+| 2026-05-10 | `3440480` | `src/llm/client.py` LLM 抽象 + News Analyst + tests |
 
 ---
 
