@@ -1,7 +1,7 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-10
-ブランチ: `claude/nikkei-futures-spec-n8Gi6`
+最終更新: 2026-05-16
+ブランチ: `claude/plan-next-tasks-G05pb`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
 
@@ -37,7 +37,16 @@
 - **テスト**
   - `tests/test_llm_client.py`: StubClient エコー・カスタム responder・get_client 切替・JSON パース 5 ケース
   - `tests/test_news_analyst.py`: スタブ経由のメモ生成・JSON フェンス対応・プロンプト内容検証・スキーマ検証エラー
+  - `tests/test_data_news.py` / `test_data_jpx.py` / `test_data_cme.py` / `test_data_fx.py`: 各データ層スタブの IF / フィルタ / デフォルト動作
   - `pyproject.toml` に `pythonpath = ["src"]` を追加（`uv sync` 後に `uv run pytest` で動作する）
+
+- **`src/data/` データ層スタブ（Stage 0 用、4 モジュール）**
+  - `src/data/news.py`: `NewsItem` / `NewsQuery` / `NewsFetcher` Protocol / `StubNewsFetcher`（since・until・sources・categories・min_impact・limit でフィルタ）。`NewsItem` / `Impact` は `agents/news_analyst.py` から本モジュールへ移管し、後方互換のため再エクスポート
+  - `src/data/jpx.py`: 日経225先物の `FuturesBar` / `FuturesQuote` / `JpxClient` Protocol（quote / bars / OI）/ `StubJpxClient`（決定論的）
+  - `src/data/cme.py`: `CmeNikkeiQuote` / `CmeNikkeiBar`（円建/ドル建）/ `CmeClient` Protocol / `StubCmeClient`
+  - `src/data/fx.py`: `FxQuote`（change / change_pct プロパティ）/ `RiskReversal`（OTM プット IV − OTM コール IV）/ `FxClient` Protocol / `StubFxClient`
+  - 各モジュールに `get_client()` / `get_fetcher()` ファクトリを置き、Stage 1+ で実 API 実装へ差替えるだけにする
+  - `pyproject.toml` の wheel packages に登録済みの `src/data` がディレクトリ未作成だった問題を同時に解消
 
 - **SPEC.md v0.3** — 日経先物情報サイトの仕様ドラフト
   - 機能 F-01〜F-09（基本機能 + AI 予測 + ニュース・情報収集）
@@ -81,11 +90,11 @@
 
 ### Medium（短期）
 
-- [ ] **データ層スタブ**
-  - `src/data/jpx.py`（日経先物期近、出来高、OI）
+- [x] **データ層スタブ**（2026-05-16 実装。Stage 0 用、`Protocol` IF + `Stub*` 実装 + `get_client()` ファクトリ）
+  - `src/data/jpx.py`（日経先物期近、OHLCV、OI）
   - `src/data/cme.py`（CME 日経夜間、円建/ドル建）
   - `src/data/fx.py`（USD/JPY、リスクリバーサル）
-  - `src/data/news.py`（F-09 のニュース取得 IF）
+  - `src/data/news.py`（F-09 のニュース取得 IF。`NewsItem` を `agents/news_analyst.py` から移管）
 
 - [ ] **PrimoAgent fork → 日経 ETF (1321) で動作確認**
   - yfinance を JPX データに差替
@@ -141,6 +150,7 @@
 | 2026-05-08 | `537cbc6` | STATUS.md コミットハッシュのバックフィル |
 | 2026-05-08 | `4baad00` | `src/` ツリーと依存（uv + hatchling）の初期セットアップ |
 | 2026-05-10 | `3440480` | `src/llm/client.py` LLM 抽象 + News Analyst + tests |
+| 2026-05-16 | _未定_ | `src/data/{news,jpx,cme,fx}.py` スタブ + tests（4 モジュール） |
 
 ---
 

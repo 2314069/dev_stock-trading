@@ -16,6 +16,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from data.news import Impact, NewsItem
 from llm.client import (
     CompletionRequest,
     LLMClient,
@@ -32,21 +33,6 @@ Horizon = Literal[
     "night_close",
     "next_open",
 ]
-
-Impact = Literal["Low", "Medium", "High"]
-
-
-class NewsItem(BaseModel):
-    """F-09 から渡されるニュース 1 件 + 分類・センチメント結果。"""
-
-    timestamp: datetime
-    source: str
-    headline: str
-    summary: str | None = None
-    categories: list[str] = Field(default_factory=list)
-    impact: Impact = "Low"
-    sentiment: float = Field(0.0, ge=-1.0, le=1.0)
-    url: str | None = None
 
 
 class NewsAnalysisRequest(BaseModel):

@@ -21,8 +21,9 @@ venv/
 .env.local
 .env.*.local
 
-# Data (large files / private)
-data/
+# Data (large files / private). 先頭スラッシュでトップレベル `data/` のみ無視する
+# （`src/data/` のソースコード配下まで巻き込まないため）。
+/data/
 *.parquet
 *.feather
 *.h5
