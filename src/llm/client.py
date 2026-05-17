@@ -13,9 +13,21 @@ import re
 from collections.abc import Callable
 from typing import Literal, Protocol
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-DEFAULT_MODEL = "claude-sonnet-4-6"
+from config import get_settings
+
+
+def _default_model() -> str:
+    return get_settings().llm.default_model
+
+
+def _default_max_tokens() -> int:
+    return get_settings().llm.default_max_tokens
+
+
+def _default_temperature() -> float:
+    return get_settings().llm.default_temperature
 
 
 class Message(BaseModel):
@@ -26,9 +38,9 @@ class Message(BaseModel):
 class CompletionRequest(BaseModel):
     messages: list[Message]
     system: str | None = None
-    model: str = DEFAULT_MODEL
-    max_tokens: int = 2048
-    temperature: float = 0.0
+    model: str = Field(default_factory=_default_model)
+    max_tokens: int = Field(default_factory=_default_max_tokens)
+    temperature: float = Field(default_factory=_default_temperature)
 
 
 class CompletionResult(BaseModel):
@@ -123,7 +135,6 @@ def parse_json_response(content: str) -> dict[str, object]:
 
 
 __all__ = [
-    "DEFAULT_MODEL",
     "AnthropicClient",
     "CompletionRequest",
     "CompletionResult",

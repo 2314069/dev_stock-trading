@@ -12,56 +12,19 @@ F-08 の他エージェント (Technical / Sentiment / Researcher Bull-Bear / Po
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-from llm.client import (
-    CompletionRequest,
-    LLMClient,
-    Message,
-    get_client,
-    parse_json_response,
-)
-
-Horizon = Literal[
-    "open_today",
-    "close_today",
-    "afternoon_open",
-    "night_open",
-    "night_close",
-    "next_open",
-]
-
-Impact = Literal["Low", "Medium", "High"]
-
-
-class NewsItem(BaseModel):
-    """F-09 から渡されるニュース 1 件 + 分類・センチメント結果。"""
-
-    timestamp: datetime
-    source: str
-    headline: str
-    summary: str | None = None
-    categories: list[str] = Field(default_factory=list)
-    impact: Impact = "Low"
-    sentiment: float = Field(0.0, ge=-1.0, le=1.0)
-    url: str | None = None
+from agents.types import DirectionalMemo, Horizon
+from data.news import Impact, NewsItem
+from llm.client import LLMClient
+from llm.runner import run_json_agent
 
 
 class NewsAnalysisRequest(BaseModel):
     horizon: Horizon
     as_of: datetime
     news: list[NewsItem]
-
-
-class DirectionalMemo(BaseModel):
-    """News Analyst の出力。F-08 のアンサンブル入力 / 寄与要因表示で消費される。"""
-
-    direction: Literal["bullish", "neutral", "bearish"]
-    confidence: int = Field(ge=0, le=100)
-    key_drivers: list[str] = Field(default_factory=list)
-    summary: str
 
 
 SYSTEM_PROMPT = """\
@@ -118,18 +81,14 @@ def analyze(
     model: str | None = None,
 ) -> DirectionalMemo:
     """News Analyst を 1 回実行する。"""
-    client = client or get_client()
-    completion_kwargs: dict[str, object] = {
-        "system": SYSTEM_PROMPT,
-        "messages": [Message(role="user", content=_build_user_message(req))],
-        "max_tokens": 1024,
-        "temperature": 0.0,
-    }
-    if model is not None:
-        completion_kwargs["model"] = model
-    result = client.complete(CompletionRequest(**completion_kwargs))  # type: ignore[arg-type]
-    payload = parse_json_response(result.content)
-    return DirectionalMemo.model_validate(payload)
+    return run_json_agent(
+        system=SYSTEM_PROMPT,
+        user=_build_user_message(req),
+        schema=DirectionalMemo,
+        client=client,
+        model=model,
+        max_tokens=1024,
+    )
 
 
 __all__ = [
