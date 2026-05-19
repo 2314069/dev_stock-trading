@@ -1,0 +1,24 @@
+{
+  "symbol": "^N225",
+  "source": "none",
+  "data_latest_date": null,
+  "bars": [],
+  "indicators": null,
+  "notes": "テクニカル指標取得失敗。実行環境の network policy により finance.yahoo.com / stooq.com / investing.com / google.com/finance などへの直接 HTTP は全て 403 (Host not in allowlist)。WebFetch も同じく主要 finance ソースは 403。WebSearch は通るが AI 要約レベルで、複数クエリ間で価格が不整合 (例: 2026-05-18 close = 60815.95 vs 2026-05-15 close = 61409.29、整合性が取れない)。OHLC 連続データに到達不能のため、Technical Analyst は今回スキップする。",
+  "attempted_sources": [
+    "Stooq CSV",
+    "FRED CSV (NIKKEI225)",
+    "Yahoo Finance history",
+    "Investing.com history",
+    "Macrotrends",
+    "Nikkei.co.jp 公式アーカイブ",
+    "Wikipedia",
+    "CNBC",
+    "Google Finance",
+    "Barchart",
+    "WSJ",
+    "TradingEconomics",
+    "FinancialContent"
+  ],
+  "recommendation": "本実装では JPX FTP / Alpha Vantage API key / yfinance を allowlist 対応の環境で実行。プロトタイプ環境のままなら ANTHROPIC_API_KEY 同様、サブスクではなく外部実行が必要。"
+}
