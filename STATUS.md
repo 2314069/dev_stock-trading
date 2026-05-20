@@ -1,7 +1,7 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-16 (差替容易性リファクタ — config / LLM runner / Orchestrator Protocol)
-ブランチ: `claude/plan-next-tasks-G05pb`
+最終更新: 2026-05-18 (サブエージェント実行版の playbook を追加)
+ブランチ: `claude/plan-next-tasks-h60S6`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
 
@@ -60,6 +60,14 @@
   - SPEC §F-08 の最終出力のうち **LLM で生成可能な部分** を担当。予測レンジ・ポイント・類似日は ML モデル側として分離
   - `horizon` は req から直接埋め、LLM に echo させない設計
   - プロンプトで「direction は最大確率と整合」「分布の和は 1.0 ±0.01」「入力に無い観点は採用しない」を制約
+
+- **`playbooks/` サブエージェント実行版（2026-05-18）— Claude Code サブスクで動かすプロトタイプ**
+  - 本実装 (`src/graph/langgraph_impl.py`) 完成までの **二段ロケット戦略の前段**。プロトタイプで検証 → 有効なものを本実装に昇格させる流れ
+  - `playbooks/predict.md`: F-08 を end-to-end で 1 回回す手順書。Claude (チャット内) が読んで Agent ツールでサブエージェント並列起動 → `runs/<date>_<horizon>/` に成果物保存
+  - **プロンプトと I/O スキーマは `src/agents/*.py` を単一の正とする**。playbook は「あの SYSTEM_PROMPT を読んで使え」と参照するのみ（二重管理回避）
+  - `playbooks/README.md`: 位置づけ・課金区分（サブスク vs API 従量）・制約を明記
+  - `runs/README.md`: 出力ディレクトリ構造の仕様（`inputs.json` / `01_news.json` … `05_plan.json` / `summary.md`）
+  - 制約: サブエージェントのモデルが `claude-sonnet-4-6` と一致しない可能性、Bull/Bear マルチターン議論は手動、Web からのニュース取得品質はソース依存
 
 - **差替容易性リファクタ（2026-05-16）— 技術要素のスイッチを 1 ファイル変更で済むように**
   - `src/config/` 設定層を新設。`Settings` / `LLMSettings` を pydantic で定義し、環境変数（`LLM_DEFAULT_MODEL` / `LLM_DEFAULT_MAX_TOKENS` / `LLM_DEFAULT_TEMPERATURE`）から上書き可能。`get_settings()` / `set_settings()` / `reset_settings()` でシングルトン管理。`.env` も自動ロード
@@ -135,7 +143,13 @@
   - [x] Researcher Bull / Bear（2026-05-16 実装。議論オーケストレーションは graph 層に後回し）
   - [x] Portfolio Manager（2026-05-16 実装。F-08 エージェント群が一通り揃った）
 
+- [ ] **`playbooks/predict.md` を 1 回走らせる（サブエージェント実行版の動作確認）**
+  - 対象とホライゾンを決め（例: 直近営業日の `^N225` 寄付）、Claude が実際に Agent ツールで各役割を起動
+  - 観察ポイント: JSON 出力の安定性、ニュース収集の質、各エージェント出力の整合性、最終 `PortfolioPlan` の妥当性
+  - `runs/<date>_<horizon>/summary.md` に気付きを残す（プロンプト改修のシード）
+
 - [ ] **オーケストレーション (src/graph/) の LangGraph 実装**
+  - playbook で有効と判明したフロー・プロンプトを本実装に昇格させる
   - IF は `graph/orchestrator.py` の `Orchestrator` Protocol で固定済み
   - 具象実装 (`graph/langgraph_impl.py` など) を追加し、`get_orchestrator()` で差替
   - News × N → Sentiment Aggregator → (Technical と並列) → Bull/Bear 議論 (rounds) → Portfolio Manager
@@ -210,6 +224,7 @@
 | 2026-05-16 | `6b0dcbd` | Researcher Bull / Bear + LabeledMemo を types に集約 |
 | 2026-05-16 | `4fb2dc3` | Portfolio Manager + `PortfolioPlan` / `DirectionProbabilities` 型追加 |
 | 2026-05-16 | `89e1090` | 差替容易性リファクタ: `src/config/` + `llm/runner.py` + `graph/orchestrator.py` Protocol |
+| 2026-05-18 | `08f5b25` | `playbooks/predict.md` + `runs/` — サブエージェント実行版プロトタイプ |
 
 ---
 
