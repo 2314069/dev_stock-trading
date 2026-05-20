@@ -1,0 +1,23 @@
+{
+  "fixture_id": "2026-05-19_macro_heavy",
+  "label": "米金利上昇・原油高・日銀タカ派観測の重い日 (2026-05-18 引け after)",
+  "collected_at": "2026-05-18T15:30:00+09:00",
+  "collected_for": {
+    "target_date": "2026-05-19",
+    "horizon": "next_open",
+    "symbol": "^N225",
+    "as_of": "2026-05-18T15:15:00+09:00"
+  },
+  "news": {
+    "count": 25,
+    "period_covered": "2026-04-20 〜 2026-05-18",
+    "method": "Claude Code subagent (general-purpose) + WebSearch / WebFetch",
+    "quality_note": "WebSearch / WebFetch 経由のため、一部は AI 要約レベルの誤差を含む可能性。一次ソース API (Reuters / Bloomberg) や TDnet / EDINET で再取得する設計が望ましい。"
+  },
+  "technicals": {
+    "status": "failed",
+    "reason": "Network policy で yfinance / Stooq / Yahoo / FRED CSV 全て 403。WebSearch は通るが AI 要約で価格不整合 (5/15 vs 5/18 で 600 円差など)。",
+    "see": "technicals_failed.json"
+  },
+  "label_status": "pending (実際の 2026-05-19 寄付値が判明したら埋める)"
+}

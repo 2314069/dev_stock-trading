@@ -1,15 +1,19 @@
-# 予測実行 playbook (F-08 end-to-end, サブエージェント版)
+# a01_f08_subagent: F-08 end-to-end playbook
 
 Claude Code の Agent ツールでサブエージェントを並列起動し、F-08 マルチエージェント
 パイプライン (News / Technical / Sentiment / Bull / Bear / Portfolio Manager) を
-1 回回す手順書。本実装 (`src/graph/langgraph_impl.py`) の代替プロトタイプ。
+1 回回す手順書。本実装 (`src/graph/langgraph_impl.py` = `a02_langgraph_pipeline`) 完成までの
+プロトタイプ architecture。
 
 ---
 
 ## トリガ例
 
 ユーザ:
-> Claude、`playbooks/predict.md` で 2026-05-19 寄付 (`^N225`) の予測やって
+> Claude、`architectures/a01_f08_subagent/playbook.md` で
+> scenario=`s01_baseline`、fixture=`fixtures/2026-05-19_macro_heavy/` を走らせて
+
+シナリオ指定がない場合は `s01_baseline` を既定。fixture 指定がない場合は Step 1 で新規収集。
 
 ---
 
@@ -30,11 +34,11 @@ Claude Code の Agent ツールでサブエージェントを並列起動し、F
 
 ## 出力
 
-`runs/<date>_<horizon>/` 以下に成果物を保存:
+`runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/` 以下に成果物を保存:
 
 ```
-runs/2026-05-19_open_today/
-  inputs.json           # PredictionRequest 相当 + 取得した NewsItem / TechnicalIndicators
+runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/
+  manifest.json         # 何を使ったか宣言 (arch / scenario / fixture / models)
   01_news.json          # News Analyst → DirectionalMemo
   02_technical.json     # Technical Analyst → DirectionalMemo
   03_sentiment.json     # (任意) Sentiment Aggregator → DirectionalMemo
@@ -46,23 +50,37 @@ runs/2026-05-19_open_today/
 
 各 JSON は対応する Pydantic スキーマ (`src/agents/types.py`) に従う。
 
+入力 (NewsItem / TechnicalIndicators) は `fixtures/<id>/` に置く（複数 arch / scenario で
+再利用するため、run 配下には置かない）。
+
 ---
 
 ## 実行ステップ
 
 ### Step 0: 準備
 
-1. `mkdir -p runs/<date>_<horizon>/`
-2. 必要なソースを Read し、SYSTEM_PROMPT と入力フォーマッタを確認:
+1. `mkdir -p runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/`
+2. `architectures/a01_f08_subagent/scenarios/<scenario_id>.json` を Read し
+   - `params` (debate_rounds / news_split_by_category / skip_* 等) を確認
+   - `prompts` で差替指定があれば該当 `prompts/<agent>/<variant>.md` を Read
+3. 必要なソースを Read し、SYSTEM_PROMPT と入力フォーマッタを確認:
    - `src/agents/types.py`（`DirectionalMemo` / `LabeledMemo` / `PortfolioPlan`）
    - `src/agents/news_analyst.py`（`SYSTEM_PROMPT`, `_build_user_message`）
    - `src/agents/technical_analyst.py`
    - `src/agents/sentiment_aggregator.py`
    - `src/agents/researchers.py`（`BULL_SYSTEM_PROMPT` / `BEAR_SYSTEM_PROMPT`）
    - `src/agents/portfolio_manager.py`
-3. 既存の `runs/<date>_<horizon>/` がある場合は上書きの可否をユーザに確認。
+4. 既存の `runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/` がある場合は上書きの可否を
+   ユーザに確認。
 
-### Step 1: データ取得（並列で 2 つ実行）
+### Step 1: データ取得（並列で 2 つ実行、または fixture 読込）
+
+**fixture モード**: `fixtures/<id>/` 指定があれば `news.json` / `technicals.json` を読み、
+1A/1B はスキップして Step 2 へ。`technicals_failed.json` があれば Technical Analyst をスキップ
+（scenario の `params.skip_technical_if_unavailable=true` のとき）。
+
+**fresh モード** (fixture 未指定): 1A/1B を実行し、結果を新規 `fixtures/<date>_<auto_label>/` に
+保存（再利用可能化）。
 
 #### 1A. ニュース収集（WebSearch / WebFetch サブエージェント）
 
@@ -94,7 +112,7 @@ runs/2026-05-19_open_today/
 - 件数目安: 10-30 件。信頼性低いもの・重複は除外
 - 投機的・憶測ベースの記事は impact を下げる
 
-結果を `runs/<date>_<horizon>/inputs.json` の `news` フィールドに保存。
+結果を `fixtures/<新 id>/news.json` に保存（fresh モードのみ）。
 
 #### 1B. テクニカル指標取得
 
@@ -114,7 +132,8 @@ runs/2026-05-19_open_today/
 - 計算できない指標は `None` のまま
 - 任意: `recent_bars` に直近 5-10 本の足を `FuturesBar` 形式で添える
 
-結果を `runs/<date>_<horizon>/inputs.json` の `indicators` フィールドに保存。
+結果を `fixtures/<新 id>/technicals.json` に保存（fresh モードのみ）。失敗時は
+`fixtures/<新 id>/technicals_failed.json` に失敗理由を残す。
 
 **注意**: `^N225` は現物指数なので厳密には先物 (`NK=F`) と乖離する。検証段階では妥協し、
 本実装で JPX 公式データに差替予定。symbol 選択はユーザ指定に従う。
@@ -128,7 +147,7 @@ runs/2026-05-19_open_today/
   `_build_user_message()` と同じフォーマットで構築
 - **期待出力**: `DirectionalMemo` の JSON 1 つ
 - サブエージェントには「JSON のみ出力。前後に説明を付けない」と再強調
-- 結果を `runs/<date>_<horizon>/01_news.json` に保存（Pydantic で検証可能な形）
+- 結果を `runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/01_news.json` に保存（Pydantic で検証可能な形）
 
 ニュースを **カテゴリ別** に複数サブエージェントで走らせる拡張は将来。今は 1 つに統合して投入。
 
@@ -151,19 +170,20 @@ runs/2026-05-19_open_today/
 - **user**: `SentimentAggregationRequest`(`horizon`, `as_of`, `memos=LabeledMemo[]`)
 - 結果を `03_sentiment.json` に保存
 
-### Step 5: Researcher Bull + Bear（並列起動）
+### Step 5: Researcher Bull + Bear（並列起動、scenario.params.debate_rounds 回繰返）
 
-`Agent` を **2 つ並列**で起動（1 メッセージ内に 2 つの tool_use ブロックを置く）:
+`Agent` を **2 つ並列**で起動（1 メッセージ内に 2 つの tool_use ブロックを置く）。
+`debate_rounds=N` の場合、以下を N 回繰り返す（2 回目以降は前回の相手出力を `opposing_memo` に渡す）。
 
 #### Bull
-- **system**: `src/agents/researchers.py` の `BULL_SYSTEM_PROMPT`
-- **user**: `ResearcherRequest`(`horizon`, `as_of`, `memos=[news, technical]`, `opposing_memo=None`)
-- 結果を `04_bull.json` に保存
+- **system**: `src/agents/researchers.py` の `BULL_SYSTEM_PROMPT`（または scenario.prompts.researcher_bull）
+- **user**: `ResearcherRequest`(`horizon`, `as_of`, `memos=[news, technical]`, `opposing_memo=<前回の bear 出力 or None>`)
+- 結果を `04_bull.json` （単発）または `04_bull_r{N}.json` （議論モード）に保存
 
 #### Bear
-- **system**: `BEAR_SYSTEM_PROMPT`
-- **user**: 同上
-- 結果を `04_bear.json` に保存
+- **system**: `BEAR_SYSTEM_PROMPT`（または scenario.prompts.researcher_bear）
+- **user**: 同上、`opposing_memo=<前回の bull 出力 or None>`
+- 結果を `04_bear.json` または `04_bear_r{N}.json` に保存
 
 `memos` は `LabeledMemo` 配列:
 ```json
@@ -173,8 +193,7 @@ runs/2026-05-19_open_today/
 ]
 ```
 
-将来の議論ラウンド拡張: Bull/Bear をもう 1 ラウンド回す場合、各々の前回出力を
-`opposing_memo` に入れて再起動。最大 N ラウンド。
+議論ラウンド最終出力（=最後の round の memo）を Step 6 に渡す。
 
 ### Step 6: Portfolio Manager
 
@@ -190,7 +209,8 @@ runs/2026-05-19_open_today/
 
 ### Step 7: 報告
 
-`runs/<date>_<horizon>/summary.md` に以下をまとめる:
+`runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/manifest.json` を書く（arch / scenario /
+fixture / models / outputs / result_brief を宣言）。同ディレクトリの `summary.md` に以下をまとめる:
 
 ```markdown
 # 予測サマリ: <date> <horizon> <symbol>
@@ -220,7 +240,7 @@ runs/2026-05-19_open_today/
 このプロンプトはプロトタイプ検証用です。投資助言ではありません。実取引には使用しないでください。
 ```
 
-ユーザ向けには `05_plan.json` の要約と「`runs/<date>_<horizon>/` に保存しました」を返す。
+ユーザ向けには `05_plan.json` の要約と保存先パスを返す。
 
 ---
 
@@ -228,11 +248,12 @@ runs/2026-05-19_open_today/
 
 | やりたいこと | 操作 |
 |---|---|
-| プロンプトを変える | `src/agents/<name>.py` の `SYSTEM_PROMPT` を編集（本実装と共通） |
-| 入力データの形を変える | `src/agents/<name>.py` の Pydantic スキーマと `_build_user_message` を編集 |
-| 別ホライゾンで試す | このコマンドを `horizon` 違いで再実行 |
-| プロンプト変更の効果を見る | `git diff runs/` で過去 run と比較 |
-| 議論ラウンドを増やす | Step 5 を `opposing_memo` 付きでもう 1 周実行 |
+| canonical プロンプト改修 | `src/agents/<name>.py` の `SYSTEM_PROMPT` 編集（本実装と共通）→ 新 scenario で試走 |
+| プロンプトのバリアントを試す | `architectures/a01_f08_subagent/prompts/<agent>/<variant>.md` を作成 → 新 scenario の `prompts.<agent>` で参照 |
+| フロー違いを試す | 新 scenario の `params` で `debate_rounds` / `news_split_by_category` 等を変更 |
+| 別 fixture で試す | `fixtures/<別 id>/` を指定して再実行 |
+| 別日付・別 horizon | `as_of` / `target_date` / `horizon` を変えて実行 |
+| 別 architecture と比較 | `architectures/<別 arch>/` を実装、同 fixture で走らせて `eval/` で採点 |
 
 ---
 

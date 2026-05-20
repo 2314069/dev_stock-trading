@@ -1,0 +1,321 @@
+[
+  {
+    "headline": "ケビン・ウォーシュ氏が次期FRB議長に上院承認、5月15日にパウエル氏退任",
+    "summary": "上院は5月13日、トランプ大統領が指名したケビン・ウォーシュ氏を次期FRB議長に54対45で承認。パウエル氏の議長任期は5月15日に満了し、ウォーシュ氏が第17代議長に就任予定。タカ派寄りとみられ、利下げ期待を後退させる可能性。パウエル氏は理事として残留。",
+    "source": "CNBC",
+    "url": "https://www.cnbc.com/2026/05/13/kevin-warsh-wins-senate-confirmation-as-the-next-federal-reserve-chair.html",
+    "timestamp": "2026-05-13T20:00:00-04:00",
+    "sentiment": -0.3,
+    "impact": "high",
+    "categories": [
+      "central_bank",
+      "us_market",
+      "geopolitics"
+    ]
+  },
+  {
+    "headline": "米4月CPIは前年比+3.8%に加速、コアも+2.8%でFRB目標を大幅超過",
+    "summary": "労働省が5月12日発表した4月CPIは前月比+0.6%、前年比+3.8%と2023年5月以来の高水準。エネルギーが+3.8%、ガソリンが年率+28.4%と中東情勢の影響が顕著。コアCPIも+0.4%/+2.8%。インフレ長期化観測で米金利上昇、株式に逆風で日経先物にもネガティブ。",
+    "source": "CNBC",
+    "url": "https://www.cnbc.com/2026/05/12/cpi-inflation-april-2026-.html",
+    "timestamp": "2026-05-12T08:30:00-04:00",
+    "sentiment": -0.6,
+    "impact": "high",
+    "categories": [
+      "us_market",
+      "central_bank",
+      "economic_indicator"
+    ]
+  },
+  {
+    "headline": "米10年債利回り、5月15日に4.59%へ上昇—年内5%到達観測も",
+    "summary": "中東情勢長期化による原油高、4月CPI/PPI上振れ、FRB議長交代を巡る思惑から米10年債利回りが約1年ぶり高水準の4.59%へ上昇。スタンダードバンクは年内5%到達を予想。日米金利差拡大は円安要因だが、グロース株・ハイテク株への売り圧力で日経先物には総じてネガティブ。",
+    "source": "Bloomberg",
+    "url": "https://www.bloomberg.com/jp/news/articles/2026-05-13/TEXYI7T96OSK00",
+    "timestamp": "2026-05-15T16:00:00-04:00",
+    "sentiment": -0.5,
+    "impact": "high",
+    "categories": [
+      "us_market",
+      "central_bank",
+      "fx"
+    ]
+  },
+  {
+    "headline": "米国株5月15日大幅下落、S&P500は-1.14%、ナスダックは-1.62%",
+    "summary": "5月15日のNY市場はS&P500が-1.14%(7,408.50)、ダウ-0.81%(49,526.17)、ナスダック-1.62%と3指数揃って大幅安。トランプ氏訪中サミット後の不透明感、原油高によるインフレ警戒、米金利上昇が重荷。日経先物の翌寄付に強いマイナス影響。",
+    "source": "TheStreet",
+    "url": "https://www.thestreet.com/latest-news/stock-market-today-may-15-2026-updates",
+    "timestamp": "2026-05-15T16:00:00-04:00",
+    "sentiment": -0.7,
+    "impact": "high",
+    "categories": [
+      "us_market"
+    ]
+  },
+  {
+    "headline": "USD/JPY、6営業日続伸で158円台後半—5月18日に158.90",
+    "summary": "5月18日のドル円は158.9040と6営業日続伸。米CPI上振れと10年債利回り4.59%への上昇でFRB再利上げ観測が浮上、ドル買い円売りが継続。一般に円安は日経採用の輸出企業の業績にプラスだが、米金利急騰のリスクオフ環境では恩恵限定的。",
+    "source": "Trading Economics",
+    "url": "https://tradingeconomics.com/japan/currency",
+    "timestamp": "2026-05-18T15:00:00+09:00",
+    "sentiment": 0.2,
+    "impact": "high",
+    "categories": [
+      "fx",
+      "us_market"
+    ]
+  },
+  {
+    "headline": "日経平均5月15日終値は1244円(2.0%)安の61,409円—フジクラ失速主因",
+    "summary": "5月15日の日経平均は前日比1244円安の61,409円で続落。前日のフジクラ決算後ストップ安をきっかけにAI関連の利益確定売りが波及、日米金利上昇・原油高も重荷。テクニカル面で過熱感調整が継続中で、翌週寄付に弱気バイアス。",
+    "source": "日経",
+    "url": "https://www.nikkei.com/article/DGXZQOFL150SJTV10C26A5000000/",
+    "timestamp": "2026-05-15T15:30:00+09:00",
+    "sentiment": -0.6,
+    "impact": "high",
+    "categories": [
+      "us_market",
+      "earnings"
+    ]
+  },
+  {
+    "headline": "日経平均5月18日終値は593円安の60,815円、3日続落",
+    "summary": "5月18日の日経平均は前日比593円(0.97%)安の60,815.95円で3営業日続落。米長期金利上昇と中東緊張による原油高でリスク回避売り。SGX日経先物は400円安の61,525円で寄り付き弱含み。翌5月19日寄付は重く始まる地合い。",
+    "source": "日経",
+    "url": "https://www.nikkei.com/article/DGXZQOFL180GW0Y6A510C2000000/",
+    "timestamp": "2026-05-18T15:00:00+09:00",
+    "sentiment": -0.5,
+    "impact": "high",
+    "categories": [
+      "us_market",
+      "geopolitics"
+    ]
+  },
+  {
+    "headline": "中東情勢で原油高止まり—ブレント5月18日は一時111ドル超、102ドル付近に低下",
+    "summary": "5月18日のブレント原油は早朝に111ドル超まで上昇後、102ドル付近に低下。イラン戦争長期化とホルムズ海峡リスクが上値圧力。原油高は日本にとって貿易赤字・インフレ要因で、自動車・電力等にネガティブ、商社・石油株にはプラスのまだら模様。",
+    "source": "Fortune",
+    "url": "https://fortune.com/article/price-of-oil-05-15-2026/",
+    "timestamp": "2026-05-18T08:00:00+09:00",
+    "sentiment": -0.4,
+    "impact": "high",
+    "categories": [
+      "geopolitics",
+      "commodity"
+    ]
+  },
+  {
+    "headline": "トランプ・習近平会談で農産物・ボーイング・原油の包括合意—5月15日終了",
+    "summary": "トランプ大統領は5月15日の2日間の北京サミット後、中国がボーイング機200機、米国産農産物年170億ドル(2028年まで)、原油輸入で合意したと発表。中国側は詳細を公表せず認識のずれも。米中対立の一時的緩和は日本株にプラスだが、関税の具体的引き下げは不透明。",
+    "source": "CNBC",
+    "url": "https://www.cnbc.com/2026/05/18/us-china-announce-deals-after-trump-xi-summit.html",
+    "timestamp": "2026-05-15T18:00:00+08:00",
+    "sentiment": 0.3,
+    "impact": "high",
+    "categories": [
+      "geopolitics",
+      "us_market"
+    ]
+  },
+  {
+    "headline": "イラン戦争長期化、ホルムズ海峡封鎖で原油高—世界エネルギー安全保障最大の危機",
+    "summary": "2月28日に開戦した米イスラエル対イランの戦争が継続。ブレント原油は開戦前の72ドルから一時120ドルへ55%超急騰。イランによるホルミ海峡閉鎖で世界石油供給の20%が影響。IEA事務局長は「史上最大のエネルギー安保危機」と発言。日本株全般にネガティブ。",
+    "source": "Al Jazeera",
+    "url": "https://www.aljazeera.com/news/2026/4/30/oil-prices-soar-on-fears-of-long-supply-disruption-us-siege-of-iran-ports",
+    "timestamp": "2026-05-18T10:00:00+09:00",
+    "sentiment": -0.6,
+    "impact": "high",
+    "categories": [
+      "geopolitics",
+      "commodity"
+    ]
+  },
+  {
+    "headline": "フジクラがストップ安、決算後に時価総額11兆円から-19%急落—5月14日",
+    "summary": "5月14日に2026年3月期決算を発表したフジクラは過去最高益にもかかわらず、27年3月期営業利益ガイダンス2,110億円が市場予想2,500億円を約15%下回り株価ストップ安(-19.10%)。AI関連株全般への失望売り波及、5月15日の日経平均急落の主因に。",
+    "source": "日経",
+    "url": "https://www.nikkei.com/article/DGXZQOFL1444Q0U6A510C2000000/",
+    "timestamp": "2026-05-14T13:00:00+09:00",
+    "sentiment": -0.5,
+    "impact": "high",
+    "categories": [
+      "earnings",
+      "us_market"
+    ]
+  },
+  {
+    "headline": "ソフトバンクG、26年3月期純利益5兆円超で日本企業史上最高益—27年予想は非開示",
+    "summary": "5月13日発表のSBG決算で純利益は前年比4.3倍の5兆22億円、売上高7兆387億円と過去最高。OpenAI関連投資が牽引。ただし27年3月期業績は非開示で先行き不透明感も。日経225寄与度トップ銘柄として相場に大きな影響、米金利動向次第で買い直し可能性。",
+    "source": "ITmedia",
+    "url": "https://www.itmedia.co.jp/aiplus/articles/2605/13/news128.html",
+    "timestamp": "2026-05-13T15:00:00+09:00",
+    "sentiment": 0.4,
+    "impact": "high",
+    "categories": [
+      "earnings"
+    ]
+  },
+  {
+    "headline": "アドバンテスト26年3月期4Q営業益2.39倍、27年予想も25%増の強気見通し",
+    "summary": "アドバンテスト26年3月期4Qは増収+41.2%、営業益+139%と過去最高。27年3月期予想も売上1.42兆円(+25.8%)、営業益6,275億円(+25.7%)と強気。生成AI向けテスター需要が継続。半導体・AI関連の中で相対的に強気材料だが、フジクラショックの逆風下で限定的。",
+    "source": "楽天証券トウシル",
+    "url": "https://media.rakuten-sec.net/articles/-/52320",
+    "timestamp": "2026-05-12T15:00:00+09:00",
+    "sentiment": 0.3,
+    "impact": "medium",
+    "categories": [
+      "earnings"
+    ]
+  },
+  {
+    "headline": "トヨタ27年3月期営業益予想3兆円(-20.3%)、米関税1.38兆円のマイナス響く",
+    "summary": "5月8日発表のトヨタ26年3月期は売上高50.68兆円(+5.5%)で過去最高も、営業益は3.77兆円(-21.5%)。米国関税が1.38兆円の減益要因。27年3月期は売上51兆円(+0.6%)、営業益3兆円(-20.3%)と中東情勢を考慮し減益予想。自動車セクターに重し。",
+    "source": "Car Watch",
+    "url": "https://car.watch.impress.co.jp/docs/news/2107163.html",
+    "timestamp": "2026-05-08T15:00:00+09:00",
+    "sentiment": -0.3,
+    "impact": "medium",
+    "categories": [
+      "earnings",
+      "geopolitics"
+    ]
+  },
+  {
+    "headline": "日銀6月会合での追加利上げ観測強まる—ブルームバーグ調査で55%が予想",
+    "summary": "ブルームバーグがエコノミスト51名に行った調査で最多の55%が6月会合での利上げ予想、88%が7月までの追加利上げを見込む。4月28日会合では政策金利0.75%据置だが、賛成6・反対3で利上げ派が増加。物価上振れリスク警戒。円高・金融株プラス、輸出株マイナス。",
+    "source": "Bloomberg",
+    "url": "https://www.bloomberg.com/jp/news/articles/2026-04-21/TDTVE2T9NJM000",
+    "timestamp": "2026-05-14T12:00:00+09:00",
+    "sentiment": -0.2,
+    "impact": "high",
+    "categories": [
+      "central_bank"
+    ]
+  },
+  {
+    "headline": "日銀MASU審議委員「政策金利を可能な限り早期に引き上げるべき」—5月14日鹿児島講演",
+    "summary": "日銀の真壁審議委員は5月14日、鹿児島経済同友会で講演し、戦争に起因するインフレ持続リスクの高まりを踏まえ「政策金利を可能な限り早期に引き上げるべき」と発言。タカ派姿勢が改めて確認され、JGB10年利回りは2.7%へ上昇。円高・株安バイアス。",
+    "source": "日本銀行",
+    "url": "https://www.boj.or.jp/en/about/press/koen_2026/ko260514a.htm",
+    "timestamp": "2026-05-14T14:00:00+09:00",
+    "sentiment": -0.3,
+    "impact": "high",
+    "categories": [
+      "central_bank"
+    ]
+  },
+  {
+    "headline": "日本10年JGB利回りが2.7%へ上昇、約10年ぶり高水準",
+    "summary": "日本の10年国債利回りが5月15日に2.7%付近まで上昇し約10年ぶり高水準。4月企業物価指数(PPI)が+4.9%と3月+2.9%から急加速、市場予想+3.0%を大幅上回りBOJ追加利上げ観測が強まる。過去4週間で30.6bp上昇。グロース株・REITに逆風で日経平均にネガティブ。",
+    "source": "Trading Economics",
+    "url": "https://tradingeconomics.com/japan/government-bond-yield",
+    "timestamp": "2026-05-15T15:00:00+09:00",
+    "sentiment": -0.4,
+    "impact": "high",
+    "categories": [
+      "central_bank",
+      "economic_indicator"
+    ]
+  },
+  {
+    "headline": "日本1-3月期GDP1次速報、5月19日発表—市場予想は前期比年率+1.7〜+2.9%",
+    "summary": "内閣府は5月19日に1-3月期GDP1次速報を公表予定。大和総研は前期比年率+2.9%、第一生命経済研究所は+1.7%と予想。2四半期連続プラス成長見込み。日経先物寄付の翌5/19朝の重要イベント。上振れなら円高と株高、下振れなら円安と株安両様の反応。",
+    "source": "大和総研",
+    "url": "https://www.dir.co.jp/report/research/economics/japan/20260513_025754.html",
+    "timestamp": "2026-05-18T09:00:00+09:00",
+    "sentiment": 0.0,
+    "impact": "high",
+    "categories": [
+      "economic_indicator"
+    ]
+  },
+  {
+    "headline": "ECB4月30日に主要3金利を据え置き、5月もデータ依存のスタンス継続",
+    "summary": "ECBは4月30日に主要リファイナンス金利2.15%、預金ファシリティ2.0%で据え置きを全会一致決定。中東戦争による原油高でインフレ上振れと成長下振れ双方のリスク増。ラガルド総裁は「6週間後により情報に基づいた判断ができる」と発言。日本株への直接影響は限定的。",
+    "source": "ECB",
+    "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.mp260430~81b7179e6f.en.html",
+    "timestamp": "2026-04-30T13:45:00+02:00",
+    "sentiment": 0.0,
+    "impact": "medium",
+    "categories": [
+      "central_bank"
+    ]
+  },
+  {
+    "headline": "中国人民銀行、4月のLPR据置で11カ月連続据え置き—1年3.0%、5年3.5%",
+    "summary": "PBOCは4月20日、1年LPR3.0%、5年LPR3.5%で11カ月連続据え置き。1Q中国GDP+5%と堅調、中東戦争のインフレ影響を見極める姿勢。5月20日の次回LPR発表が翌日材料の一つ。中国景気の堅調さは日本企業の対中事業にプラスだが追加緩和期待後退は中立。",
+    "source": "CNBC",
+    "url": "https://www.cnbc.com/2026/04/20/china-keeps-benchmark-lending-rates-unchanged-as-economic-growth-revs-up-amid-mounting-middle-east-risk-mount-.html",
+    "timestamp": "2026-04-20T09:15:00+08:00",
+    "sentiment": 0.1,
+    "impact": "medium",
+    "categories": [
+      "central_bank",
+      "geopolitics"
+    ]
+  },
+  {
+    "headline": "Nvidia決算が5月20日に控える—AIラリーの試金石",
+    "summary": "Nvidiaは5月20日NY市場後にFY1Q決算を発表予定。コンセンサスは売上+79%増。BlackwellチップやVera Rubin、AI設備投資の継続性が焦点。期待を下回れば半導体・ナスダック全般に売り波及で日経のSBG/アドバン/東エレ/ディスコ等に重大影響。19日の寄付段階では様子見支配。",
+    "source": "FXStreet",
+    "url": "https://www.fxstreet.com/news/nvidia-earnings-preview-ai-rally-faces-its-next-reality-check-202605180637",
+    "timestamp": "2026-05-18T06:37:00+00:00",
+    "sentiment": 0.0,
+    "impact": "high",
+    "categories": [
+      "earnings",
+      "us_market"
+    ]
+  },
+  {
+    "headline": "東京都区部4月CPI、3カ月連続で日銀目標2%割れの予想外の伸び縮小",
+    "summary": "総務省が4月30日発表した4月東京都区部CPIは生鮮除く総合が前年比+1.8%と日銀目標2%を3カ月連続下回り市場予想未達。一方コアコア(生鮮+エネ除く)は+2.4%と粘着的。日銀の早期利上げ判断を複雑化、6月会合の織り込みに微妙な影響。",
+    "source": "Bloomberg",
+    "url": "https://www.bloomberg.com/jp/news/articles/2026-04-30/TEAS54KJH6V400",
+    "timestamp": "2026-04-30T08:30:00+09:00",
+    "sentiment": 0.1,
+    "impact": "medium",
+    "categories": [
+      "economic_indicator",
+      "central_bank"
+    ]
+  },
+  {
+    "headline": "全国4月CPIは5月22日発表予定—コア物価動向に注目",
+    "summary": "総務省は5月22日に全国4月CPIを公表予定。3月実績は総合+1.5%、生鮮除く+1.8%、生鮮・エネ除く+2.4%。エネルギー価格上昇の波及度合いと、東京都区部の弱含み傾向が全国にも反映されるかが焦点。日銀6月利上げ判断に直結する重要指標。19日寄付直接影響は限定的。",
+    "source": "総務省統計局",
+    "url": "https://www.stat.go.jp/data/cpi/sokuhou/tsuki/index-z.html",
+    "timestamp": "2026-05-18T12:00:00+09:00",
+    "sentiment": 0.0,
+    "impact": "medium",
+    "categories": [
+      "economic_indicator",
+      "central_bank"
+    ]
+  },
+  {
+    "headline": "5月15日株探週末コメント、来週の日経平均レンジ予想は61,300-62,300円",
+    "summary": "株探の週末コメントは来週の日経平均予想レンジを61,300-62,300円と提示。日米長期金利上昇を警戒材料に挙げる一方、保険・商社・自動車・ガラス土石など今週パフォーマンス良好業種への注目継続を予想。中東情勢悪化が想定外の下振れリスク。",
+    "source": "株探",
+    "url": "https://s.kabutan.jp/news/n202605151376/",
+    "timestamp": "2026-05-15T17:00:00+09:00",
+    "sentiment": 0.0,
+    "impact": "low",
+    "categories": [
+      "us_market"
+    ]
+  },
+  {
+    "headline": "日銀副総裁HIMINO氏が5月16日講演—「貨幣の単一性と中央銀行の役割」",
+    "summary": "氷見野日銀副総裁が5月16日、日本金融学会で「貨幣の単一性と中央銀行の役割」をテーマに講演。デジタル通貨と金融システム安定性に焦点が当たり、直接的な金融政策発信は限定的だが、デジタル円・暗号資産関連銘柄に思惑的な影響可能性。日経全体への影響は中立。",
+    "source": "日本銀行",
+    "url": "https://www.boj.or.jp/en/about/press/index.htm",
+    "timestamp": "2026-05-16T10:00:00+09:00",
+    "sentiment": 0.0,
+    "impact": "low",
+    "categories": [
+      "central_bank"
+    ]
+  }
+]

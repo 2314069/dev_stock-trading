@@ -1,6 +1,6 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-18 (サブエージェント実行版の playbook を追加)
+最終更新: 2026-05-19 (architecture-first リストラ — 複数アーキテクチャを並列に試せる構造に)
 ブランチ: `claude/plan-next-tasks-h60S6`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
@@ -61,13 +61,23 @@
   - `horizon` は req から直接埋め、LLM に echo させない設計
   - プロンプトで「direction は最大確率と整合」「分布の和は 1.0 ±0.01」「入力に無い観点は採用しない」を制約
 
-- **`playbooks/` サブエージェント実行版（2026-05-18）— Claude Code サブスクで動かすプロトタイプ**
-  - 本実装 (`src/graph/langgraph_impl.py`) 完成までの **二段ロケット戦略の前段**。プロトタイプで検証 → 有効なものを本実装に昇格させる流れ
-  - `playbooks/predict.md`: F-08 を end-to-end で 1 回回す手順書。Claude (チャット内) が読んで Agent ツールでサブエージェント並列起動 → `runs/<date>_<horizon>/` に成果物保存
+- **architecture-first リストラ（2026-05-19）— 複数アーキテクチャ × scenario × fixture を並列に試せる構造**
+  - 旧構成 `playbooks/predict.md` (シングル) → 新構成 `architectures/aNN_*/` (multiple) へ昇格
+  - `architectures/a01_f08_subagent/`: 旧 playbook の移行先。シングルエージェント方式は a01 と命名
+  - `architectures/README.md`: arch カタログ。a02_langgraph_pipeline / a03_tradingagents_fork / a04_crewai / a05_hierarchical / a06_single_react / a07_blackboard などを planned/idea で予約
+  - `architectures/a01_f08_subagent/scenarios/s01_baseline.json`: scenario manifest 形式を確立 (id / playbook / prompts / params / hypothesis)
+  - `fixtures/`: 入力スナップショット層。同じ news / technicals を複数 arch / scenario で再利用可能に。`2026-05-19_macro_heavy/` を最初のリアル fixture として整備
+  - `fixtures/_helpers/compute_indicators_yfinance.py`: 旧 `runs/.../compute_indicators.py` を汎用化、CLI 引数で fixture 生成可能に
+  - `eval/`: 採点ハーネス層を予約 (scorers / reports)。`PortfolioPlan` 出力が揃っているので arch 横断採点が可能
+  - `experiments/`: 仮説 × 結論レポート層を予約。eval/reports の生スコアを参照して story を残す
+  - 既存 baseline run を `runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/` へマイグレート。`manifest.json` で arch/scenario/fixture/model/outputs/result_brief を宣言
+  - 旧 `playbooks/` ディレクトリは削除（git mv で履歴保持）
+
+- **`playbooks/` サブエージェント実行版（2026-05-18, 後に architecture-first へ移行）— Claude Code サブスクで動かすプロトタイプ**
+  - 本実装 (`src/graph/langgraph_impl.py`) 完成までの **二段ロケット戦略の前段**
   - **プロンプトと I/O スキーマは `src/agents/*.py` を単一の正とする**。playbook は「あの SYSTEM_PROMPT を読んで使え」と参照するのみ（二重管理回避）
-  - `playbooks/README.md`: 位置づけ・課金区分（サブスク vs API 従量）・制約を明記
-  - `runs/README.md`: 出力ディレクトリ構造の仕様（`inputs.json` / `01_news.json` … `05_plan.json` / `summary.md`）
   - 制約: サブエージェントのモデルが `claude-sonnet-4-6` と一致しない可能性、Bull/Bear マルチターン議論は手動、Web からのニュース取得品質はソース依存
+  - 初回試走 (2026-05-19): `runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/` — Technical 取得失敗で News-only 動作、最終 direction=bearish, P(bear)=0.60, confidence=62
 
 - **差替容易性リファクタ（2026-05-16）— 技術要素のスイッチを 1 ファイル変更で済むように**
   - `src/config/` 設定層を新設。`Settings` / `LLMSettings` を pydantic で定義し、環境変数（`LLM_DEFAULT_MODEL` / `LLM_DEFAULT_MAX_TOKENS` / `LLM_DEFAULT_TEMPERATURE`）から上書き可能。`get_settings()` / `set_settings()` / `reset_settings()` でシングルトン管理。`.env` も自動ロード
@@ -143,13 +153,24 @@
   - [x] Researcher Bull / Bear（2026-05-16 実装。議論オーケストレーションは graph 層に後回し）
   - [x] Portfolio Manager（2026-05-16 実装。F-08 エージェント群が一通り揃った）
 
-- [ ] **`playbooks/predict.md` を 1 回走らせる（サブエージェント実行版の動作確認）**
-  - 対象とホライゾンを決め（例: 直近営業日の `^N225` 寄付）、Claude が実際に Agent ツールで各役割を起動
-  - 観察ポイント: JSON 出力の安定性、ニュース収集の質、各エージェント出力の整合性、最終 `PortfolioPlan` の妥当性
-  - `runs/<date>_<horizon>/summary.md` に気付きを残す（プロンプト改修のシード）
+- [x] **`a01_f08_subagent/playbook.md` を 1 回走らせる（サブエージェント実行版の動作確認）**
+  - 初回試走 完了 (2026-05-19): direction=bearish, P(bear)=0.60, confidence=62, Technical 抜きで News-only
+  - 観察: 並列実行は機能、サブエージェント JSON 厳格出力 OK、network 制約で Technical 取得不能、`horizon` は手動補完
+  - 詳細: `runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/summary.md`
 
-- [ ] **オーケストレーション (src/graph/) の LangGraph 実装**
-  - playbook で有効と判明したフロー・プロンプトを本実装に昇格させる
+- [ ] **次に試したい scenario / architecture を切る**
+  - **s02_2round_debate**: Bull/Bear 議論を 2 ラウンドに増やす（同 fixture で baseline と比較）
+  - **s03_news_root_cause**: News Analyst のプロンプトを「結果記事より原因記事優先」に改修
+  - **s04_news_by_category**: News をカテゴリ別に分割 → Sentiment Aggregator を活用
+  - **a02_langgraph_pipeline**: LangGraph 本実装。`Orchestrator` Protocol 準拠で同 fixture で a01 と比較
+
+- [ ] **eval ハーネスの最小実装**
+  - `fixtures/2026-05-19_macro_heavy/label.json` に実際の翌寄付値を埋める（後日判明）
+  - `eval/scorers/directional_accuracy.py` を最小実装
+  - 多 run 揃ったら `experiments/exp001_*/matrix.md` で横断比較
+
+- [ ] **オーケストレーション (src/graph/) の LangGraph 実装 = a02_langgraph_pipeline**
+  - a01 で有効と判明したフロー・プロンプトを本実装に昇格させる
   - IF は `graph/orchestrator.py` の `Orchestrator` Protocol で固定済み
   - 具象実装 (`graph/langgraph_impl.py` など) を追加し、`get_orchestrator()` で差替
   - News × N → Sentiment Aggregator → (Technical と並列) → Bull/Bear 議論 (rounds) → Portfolio Manager
@@ -225,6 +246,8 @@
 | 2026-05-16 | `4fb2dc3` | Portfolio Manager + `PortfolioPlan` / `DirectionProbabilities` 型追加 |
 | 2026-05-16 | `89e1090` | 差替容易性リファクタ: `src/config/` + `llm/runner.py` + `graph/orchestrator.py` Protocol |
 | 2026-05-18 | `08f5b25` | `playbooks/predict.md` + `runs/` — サブエージェント実行版プロトタイプ |
+| 2026-05-19 | `914f46f` | `runs/2026-05-19_next_open/` 初回試走 (direction=bearish, P=0.60, conf=62) |
+| 2026-05-19 | (pending) | architecture-first リストラ: `architectures/` + `fixtures/` + `eval/` + `experiments/` 層導入、a01 マイグレート |
 
 ---
 

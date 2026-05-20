@@ -1,0 +1,24 @@
+{
+  "id": "s01_baseline",
+  "title": "F-08 baseline (5 agents, 1-round debate, news 集約なし)",
+  "based_on": null,
+  "playbook": "architectures/a01_f08_subagent/playbook.md",
+  "prompts": {
+    "news_analyst": null,
+    "technical_analyst": null,
+    "sentiment_aggregator": null,
+    "researcher_bull": null,
+    "researcher_bear": null,
+    "portfolio_manager": null
+  },
+  "params": {
+    "debate_rounds": 1,
+    "news_split_by_category": false,
+    "skip_sentiment_aggregator_if_single_news_memo": true,
+    "skip_technical_if_unavailable": true
+  },
+  "fixture_constraint": "any",
+  "hypothesis": "(baseline) F-08 を最小構成で 1 回流したときの方向性予測",
+  "created_at": "2026-05-19",
+  "notes": "prompts が null のものは src/agents/*.py の canonical を使う。差替する場合は prompts/<agent>/<variant>.md のパスを指定。"
+}

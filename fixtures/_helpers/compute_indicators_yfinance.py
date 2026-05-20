@@ -1,24 +1,28 @@
-"""TechnicalIndicators 構築スクリプト (playbooks/predict.md Step 1B)。
+"""fixtures/<id>/technicals.json 構築スクリプト。
 
 yfinance から直近 250 営業日の OHLCV を取得し、
 src/agents/technical_analyst.py の TechnicalIndicators スキーマに沿った JSON を出力する。
+
+architectures/a01_f08_subagent/playbook.md の Step 1B (fresh モード) で使う。
+network allowlist に yahoo finance が含まれる環境でのみ動作。
+
+使い方:
+  uv run python fixtures/_helpers/compute_indicators_yfinance.py \\
+    --symbol ^N225 --as-of 2026-05-18T15:15:00+09:00 --horizon next_open \\
+    --out fixtures/2026-05-19_macro_heavy/technicals.json
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import yfinance as yf
 import pandas as pd
-
-
-SYMBOL = "^N225"
-RUN_DIR = Path(__file__).parent
-AS_OF = datetime(2026, 5, 18, 15, 15, 0, tzinfo=timezone(timedelta(hours=9)))
 
 
 def wilder_rsi(close: pd.Series, period: int = 14) -> float | None:
@@ -106,6 +110,16 @@ def safe_float(x) -> float | None:
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--symbol", default="^N225")
+    ap.add_argument("--as-of", required=True, help="ISO8601, e.g. 2026-05-18T15:15:00+09:00")
+    ap.add_argument("--horizon", required=True)
+    ap.add_argument("--out", required=True, type=Path)
+    args = ap.parse_args()
+
+    SYMBOL = args.symbol
+    AS_OF = datetime.fromisoformat(args.as_of)
+
     print(f"Fetching {SYMBOL} ...", file=sys.stderr)
     df = yf.download(
         SYMBOL,
@@ -158,13 +172,14 @@ def main() -> int:
     }
 
     # recent_bars: 直近 10 本
+    tz = AS_OF.tzinfo
     bars = []
     for ts, row in df.tail(10).iterrows():
         # ^N225 は終日 1 セッション。session 区分は "day" 固定。
         bars.append(
             {
                 "symbol": SYMBOL,
-                "timestamp": ts.to_pydatetime().replace(tzinfo=timezone(timedelta(hours=9))).isoformat(),
+                "timestamp": ts.to_pydatetime().replace(tzinfo=tz).isoformat(),
                 "session": "day",
                 "open": float(row["Open"]),
                 "high": float(row["High"]),
@@ -177,16 +192,15 @@ def main() -> int:
     out = {
         "symbol": SYMBOL,
         "as_of": AS_OF.isoformat(),
-        "horizon": "next_open",
+        "horizon": args.horizon,
         "data_latest_date": df.index[-1].date().isoformat(),
         "indicators": indicators,
         "recent_bars": bars,
     }
 
-    out_path = RUN_DIR / "technicals_raw.json"
-    out_path.write_text(json.dumps(out, ensure_ascii=False, indent=2))
-    print(f"Wrote {out_path}", file=sys.stderr)
-    print(json.dumps(out, ensure_ascii=False, indent=2))
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(json.dumps(out, ensure_ascii=False, indent=2))
+    print(f"Wrote {args.out}", file=sys.stderr)
     return 0
 
 

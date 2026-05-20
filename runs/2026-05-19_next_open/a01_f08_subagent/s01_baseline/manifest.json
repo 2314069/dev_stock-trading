@@ -1,0 +1,41 @@
+{
+  "run_id": "2026-05-19_next_open__a01_f08_subagent__s01_baseline",
+  "executed_at": "2026-05-19T00:30:00+09:00",
+  "executor": "Claude Code (web) — subagent-based execution",
+  "architecture": {
+    "id": "a01_f08_subagent",
+    "ref": "architectures/a01_f08_subagent/"
+  },
+  "scenario": {
+    "id": "s01_baseline",
+    "ref": "architectures/a01_f08_subagent/scenarios/s01_baseline.json"
+  },
+  "fixture": {
+    "id": "2026-05-19_macro_heavy",
+    "ref": "fixtures/2026-05-19_macro_heavy/"
+  },
+  "request": {
+    "symbol": "^N225",
+    "horizon": "next_open",
+    "as_of": "2026-05-18T15:15:00+09:00",
+    "target_date": "2026-05-19"
+  },
+  "models": {
+    "note": "サブエージェントのモデルは Claude Code セッション設定に依存。src/agents/*.py の canonical (claude-sonnet-4-6) と一致するとは限らない。"
+  },
+  "outputs": {
+    "01_news.json": "News Analyst (DirectionalMemo)",
+    "02_technical.json": "SKIPPED — fixture の technicals が failed",
+    "03_sentiment.json": "SKIPPED — scenario の skip_sentiment_aggregator_if_single_news_memo=true",
+    "04_bull.json": "Bull Researcher (DirectionalMemo)",
+    "04_bear.json": "Bear Researcher (DirectionalMemo)",
+    "05_plan.json": "Portfolio Manager (PortfolioPlan)",
+    "summary.md": "観察・気付き・免責"
+  },
+  "result_brief": {
+    "direction": "bearish",
+    "p_bearish": 0.60,
+    "confidence": 62
+  },
+  "notes": "Technical Analyst スキップにより F-08 設計の半分しか動作していない。本実装移植時は network allowlist 拡張 or 外部実行で technicals 取得が前提。"
+}
