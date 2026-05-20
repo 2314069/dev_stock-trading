@@ -247,7 +247,7 @@
 | 2026-05-16 | `89e1090` | 差替容易性リファクタ: `src/config/` + `llm/runner.py` + `graph/orchestrator.py` Protocol |
 | 2026-05-18 | `08f5b25` | `playbooks/predict.md` + `runs/` — サブエージェント実行版プロトタイプ |
 | 2026-05-19 | `914f46f` | `runs/2026-05-19_next_open/` 初回試走 (direction=bearish, P=0.60, conf=62) |
-| 2026-05-19 | (pending) | architecture-first リストラ: `architectures/` + `fixtures/` + `eval/` + `experiments/` 層導入、a01 マイグレート |
+| 2026-05-19 | `8f52609` | architecture-first リストラ: `architectures/` + `fixtures/` + `eval/` + `experiments/` 層導入、a01 マイグレート |
 
 ---
 
