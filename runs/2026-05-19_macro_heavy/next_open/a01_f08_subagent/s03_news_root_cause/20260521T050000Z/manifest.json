@@ -1,0 +1,65 @@
+{
+  "run_id": "20260521T050000Z",
+  "executed_at": "2026-05-21T05:00:00Z",
+  "git_sha": "a6d4eeb",
+  "git_sha_note": "PM 実行時点の HEAD (WIP コミット後)。News/Bull/Bear は 869620b の時点で実行。",
+  "prompts_hash": "sha256:3905164bee005566",
+  "prompts_hash_note": "src/agents/*.py 7 ファイルの SHA256 連結先頭 16 桁。canonical 自体は未改修なので s01/s02 と同 hash。News Analyst のみ variant prompt (src/agents/variants/news_analyst/root_cause.md) を使用したが、これは scenario yaml で参照されるのみで src/agents/ には変更なし。",
+  "executor": "Claude Code (web) — subagent-based execution",
+  "architecture": {
+    "id": "a01_f08_subagent",
+    "ref": "architectures/a01_f08_subagent/"
+  },
+  "scenario": {
+    "id": "s03_news_root_cause",
+    "ref": "architectures/a01_f08_subagent/scenarios/s03_news_root_cause.yaml"
+  },
+  "fixture": {
+    "id": "2026-05-19_macro_heavy",
+    "ref": "fixtures/2026-05-19_macro_heavy/"
+  },
+  "prompts_used": {
+    "news_analyst": "src/agents/variants/news_analyst/root_cause.md (variant)",
+    "researcher_bull": "canonical (src/agents/researchers.py)",
+    "researcher_bear": "canonical (src/agents/researchers.py)",
+    "portfolio_manager": "canonical (src/agents/portfolio_manager.py)"
+  },
+  "request": {
+    "symbol": "^N225",
+    "horizon": "next_open",
+    "as_of": "2026-05-18T15:15:00+09:00",
+    "target_date": "2026-05-19"
+  },
+  "models": {
+    "note": "サブエージェントのモデルは Claude Code セッション設定に依存。s01/s02 と同セッション環境。"
+  },
+  "outputs": {
+    "01_news.json": "News Analyst (DirectionalMemo) — variant prompt で再実行。key_drivers が原因記事のみに",
+    "02_technical.json": "SKIPPED — fixture の technicals が failed",
+    "03_sentiment.json": "SKIPPED — scenario の skip_sentiment_aggregator_if_single_news_memo=true",
+    "04_bull.json": "Bull Researcher (DirectionalMemo) — 1 round、新 news memo を入力",
+    "04_bear.json": "Bear Researcher (DirectionalMemo) — 1 round、新 news memo を入力",
+    "05_plan.json": "Portfolio Manager (PortfolioPlan)",
+    "summary.md": "観察と s01 / s02 との比較"
+  },
+  "result_brief": {
+    "direction": "bearish",
+    "p_bearish": 0.60,
+    "p_bullish": 0.20,
+    "p_neutral": 0.20,
+    "confidence": 70
+  },
+  "comparison_with_baseline": {
+    "baseline_run": "runs/2026-05-19_macro_heavy/next_open/a01_f08_subagent/s01_baseline/baseline_run/",
+    "deltas": {
+      "p_bearish": 0.0,
+      "p_bullish": -0.02,
+      "p_neutral": 0.02,
+      "confidence": 8,
+      "bear_confidence": 0,
+      "bull_confidence": 0
+    },
+    "interpretation": "key_drivers が結果記事から原因記事に変わったことで、PM が「確かな理由がある下落」と認識し confidence が +8 上昇。分布自体は変わらず (情報総量は同じ)。s02 (議論 2 ラウンド) が分布を動かす効果だったのに対し、s03 (プロンプト改修) は確信度を動かす効果。両者は直交する。"
+  },
+  "notes": "News Analyst variant の効果がはっきり出た: key_drivers から「日経平均終値」「米国株-1.14%」など市場サマリ記事が完全に消え、CPI/中銀発言/地政学/決算/FRB議長承認の原因記事 5/5 に置き換わった。direction/confidence は s01 と同じ (情報量同等) で、PM の confidence のみ上昇。"
+}
