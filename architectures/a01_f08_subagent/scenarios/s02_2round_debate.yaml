@@ -1,0 +1,33 @@
+id: s02_2round_debate
+title: Bull/Bear 議論を 2 ラウンド回す
+based_on: s01_baseline
+playbook: architectures/a01_f08_subagent/playbook.md
+
+prompts:
+  # baseline と同じ canonical を使う。プロンプト改修は別 scenario で。
+  news_analyst: null
+  technical_analyst: null
+  sentiment_aggregator: null
+  researcher_bull: null
+  researcher_bear: null
+  portfolio_manager: null
+
+params:
+  debate_rounds: 2
+  news_split_by_category: false
+  skip_sentiment_aggregator_if_single_news_memo: true
+  skip_technical_if_unavailable: true
+
+fixture_constraint: any
+
+hypothesis: |
+  baseline (s01) では Bull/Bear が 1 ラウンドのみで反論機会が無く、
+  Bear 単体の confidence=78 vs Bull 58 と非対称になった。
+  2 ラウンド化で相手の前回主張に直接反論させると、
+  - Bear の確信が抑制される（過信修正）
+  - Bull が反論材料を獲得して confidence が上がる
+  - 結果として最終 PortfolioPlan の direction_probabilities がより neutral 寄りに、
+    または confidence が下がる
+  これにより「反論機会の有無」が出力に与える影響を観察する。
+
+created_at: 2026-05-21
