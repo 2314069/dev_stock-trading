@@ -14,7 +14,7 @@ a01 内で試す scenario の一覧。各 `sNN_*.yaml` の概要と現状をこ�
 |---|---|---|---|---|
 | `s01_baseline` | F-08 baseline (5 agents, 1-round) | active | F-08 を最小構成で 1 回流す | 走ったが Technical 不在で半分動作 (`runs/2026-05-19_macro_heavy/next_open/a01_f08_subagent/s01_baseline/baseline_run/` 参照) |
 | `s02_2round_debate` | Bull/Bear 議論を 2 ラウンド | active | 反論機会で Bear の過信 (78) を抑制できる | **部分確認**: Bear 78→74、Bull 58→58、P(bear) 0.60→0.52、confidence 62 維持。詳細は `runs/.../s02_2round_debate/20260521T030000Z/summary.md` |
-| `s03_news_root_cause` | News Analyst プロンプト改修 (原因記事優先) | planned | key_drivers の質が向上 | - |
+| `s03_news_root_cause` | News Analyst プロンプト改修 (原因記事優先) | active | key_drivers から結果記事を排除し原因記事を選ばせる | (試行中) |
 | `s04_news_by_category` | News をカテゴリ別に分割 → Sentiment Aggregator 活性化 | planned | カテゴリ別 News Analyst の独立判断で signal がブレない | - |
 | `s05_no_technical` | Technical 抜きで PM | planned | データ欠損日でも動くか確認 | - |
 

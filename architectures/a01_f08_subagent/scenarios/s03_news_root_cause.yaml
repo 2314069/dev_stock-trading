@@ -1,0 +1,35 @@
+id: s03_news_root_cause
+title: News Analyst プロンプト改修 — 原因記事優先 (root_cause)
+based_on: s01_baseline
+playbook: architectures/a01_f08_subagent/playbook.md
+
+prompts:
+  # News Analyst のみ variant を使う
+  news_analyst: src/agents/variants/news_analyst/root_cause.md
+  technical_analyst: null
+  sentiment_aggregator: null
+  researcher_bull: null
+  researcher_bear: null
+  portfolio_manager: null
+
+params:
+  debate_rounds: 1
+  news_split_by_category: false
+  skip_sentiment_aggregator_if_single_news_memo: true
+  skip_technical_if_unavailable: true
+
+fixture_constraint: any
+
+hypothesis: |
+  s01_baseline 走行時の観察:
+  News Analyst の key_drivers に「日経平均 593 円安で 3 日続落」「米国株 5/15 大幅下落」など
+  市場サマリ記事 (= 価格動向そのものの記事) が並んでいた。これらは原因ではなく結果なので、
+  根本要因 (CPI・金利・中銀発言・地政学イベント) を優先する制約を追加する。
+
+  期待:
+  - key_drivers から「日経 X 円安」「米国株 -1.14%」のような結果記事が消える
+  - 代わりに「米 4 月 CPI」「日銀 真壁発言」「FRB 議長承認」などの原因記事が並ぶ
+  - direction / confidence は s01 から大きく変わらないはず (情報総量は同じ)
+  - 大きく変わる場合、結果記事に判断が引きずられていた証拠
+
+created_at: 2026-05-21
