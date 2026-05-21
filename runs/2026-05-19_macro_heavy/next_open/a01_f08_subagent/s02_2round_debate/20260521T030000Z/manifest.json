@@ -1,0 +1,61 @@
+{
+  "run_id": "20260521T030000Z",
+  "executed_at": "2026-05-21T03:00:00Z",
+  "git_sha": "76ebfcf",
+  "git_sha_note": "Bull/Bear r2 + PM 実行時の HEAD。WIP コミット 09777dd の親。",
+  "prompts_hash": "sha256:3905164bee005566",
+  "prompts_hash_note": "src/agents/*.py 7 ファイルの SHA256 連結先頭 16 桁。s01_baseline/baseline_run と同じ hash (canonical 未改修)。",
+  "executor": "Claude Code (web) — subagent-based execution",
+  "architecture": {
+    "id": "a01_f08_subagent",
+    "ref": "architectures/a01_f08_subagent/"
+  },
+  "scenario": {
+    "id": "s02_2round_debate",
+    "ref": "architectures/a01_f08_subagent/scenarios/s02_2round_debate.yaml"
+  },
+  "fixture": {
+    "id": "2026-05-19_macro_heavy",
+    "ref": "fixtures/2026-05-19_macro_heavy/"
+  },
+  "request": {
+    "symbol": "^N225",
+    "horizon": "next_open",
+    "as_of": "2026-05-18T15:15:00+09:00",
+    "target_date": "2026-05-19"
+  },
+  "models": {
+    "note": "サブエージェントのモデルは Claude Code セッション設定に依存。s01 と同セッション環境。"
+  },
+  "outputs": {
+    "01_news.json": "News Analyst (DirectionalMemo) — s01_baseline/baseline_run から流用 (同 fixture + 同プロンプト)",
+    "02_technical.json": "SKIPPED — fixture の technicals が failed",
+    "03_sentiment.json": "SKIPPED — scenario の skip_sentiment_aggregator_if_single_news_memo=true",
+    "04_bull_r1.json": "Bull Researcher round 1 — s01_baseline/baseline_run/04_bull.json から流用 (round 1 は opposing_memo=null で同条件)",
+    "04_bear_r1.json": "Bear Researcher round 1 — s01 から流用",
+    "04_bull_r2.json": "Bull Researcher round 2 — opposing_memo=04_bear_r1 で再構築。新規",
+    "04_bear_r2.json": "Bear Researcher round 2 — opposing_memo=04_bull_r1 で再構築。新規",
+    "05_plan.json": "Portfolio Manager — round 2 の bull/bear を使用",
+    "summary.md": "観察と s01 との比較"
+  },
+  "result_brief": {
+    "direction": "bearish",
+    "p_bearish": 0.52,
+    "p_bullish": 0.28,
+    "p_neutral": 0.20,
+    "confidence": 62
+  },
+  "comparison_with_baseline": {
+    "baseline_run": "runs/2026-05-19_macro_heavy/next_open/a01_f08_subagent/s01_baseline/baseline_run/",
+    "deltas": {
+      "p_bearish": -0.08,
+      "p_bullish": 0.06,
+      "p_neutral": 0.02,
+      "confidence": 0,
+      "bear_confidence": -4,
+      "bull_confidence": 0
+    },
+    "interpretation": "Bear の過信抑制仮説は部分的に確認 (78→74)。Bull は反論材料を獲得したが confidence は変わらず。最終 PortfolioPlan の確率分布が少し neutral 寄りに (P(bear) -0.08)。方向と confidence は同じ。"
+  },
+  "notes": "round 1 出力 (01_news / 04_bull_r1 / 04_bear_r1) は s01_baseline から流用。round 1 は opposing_memo=null で s01 と同条件のため、ノイズ削減と効率優先で再実行を回避した。"
+}
