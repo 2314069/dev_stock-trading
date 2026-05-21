@@ -1,7 +1,8 @@
 # eval/
 
-予測 (`PortfolioPlan`) を採点するハーネス。`fixtures/<id>/label.json`（実際の翌寄付値）と
-`runs/<date>/<arch>/<scenario>/05_plan.json` を突合して各種スコアを計算する。
+予測 (`PortfolioPlan`) を採点するハーネス。`fixtures/<id>/label.json`（`ActualOutcome`）と
+`runs/<fixture>/<horizon>/<arch>/<scenario>/<run_id>/05_plan.json` を突合して
+各種スコアを計算する。
 
 ## なぜ共有層なのか
 
@@ -34,10 +35,13 @@ uv run python -m eval.score \
 uv run python -m eval.shootout --fixture 2026-05-19_macro_heavy
 ```
 
-## レポート
+## 出力
 
-`reports/<date>_<topic>.md` に採点結果を蓄積。`experiments/` と違い、こちらは **生スコア表** に
-近い性質。`experiments/` の結論レポートは reports を参照して書く。
+生スコアは `experiments/expNNN_<topic>/scores.json` に書く。`eval/` 自体に reports は置かない
+（生スコアと解釈レポートを 1 箇所に集約するため）。
+
+`scorers/<name>.py` は CLI 起動時の入力は `--run` と `--label`、出力は標準出力 JSON、副作用なし
+の純粋関数として設計し、`experiments/` 側からも呼び出せる形にする。
 
 ## 現状
 
@@ -45,4 +49,5 @@ uv run python -m eval.shootout --fixture 2026-05-19_macro_heavy
 
 1. `fixtures/<id>/label.json` を 1 件埋める（2026-05-19 の実際の値）
 2. `scorers/directional_accuracy.py` を最小実装
-3. 第 2 arch (a02) が出来てから shootout を整備
+3. `experiments/exp001_a01_baseline_observation/scores.json` を埋める
+4. 第 2 arch (a02) が出来てから shootout を整備

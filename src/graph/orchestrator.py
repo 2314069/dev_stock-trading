@@ -1,8 +1,12 @@
 """F-08 予測パイプラインのオーケストレーション抽象。
 
 このモジュールはオーケストレーションフレームワーク (LangGraph / CrewAI / 自作 など) を
-1 つに固定しないための薄い IF を提供する。具体実装は `src/graph/` 配下に並べ、
-`get_orchestrator()` でファクトリ差替する。
+1 つに固定しないための薄い IF を提供する。
+
+**具象実装の置き場**: `src/graph/` 直下には Protocol と StubOrchestrator のみを置く。
+LangGraph / CrewAI / TradingAgents 等の具体実装は `architectures/aNN_<name>/impl.py` に
+集約し、`get_orchestrator()` でファクトリ差替する。これにより `src/` は arch 共有部品、
+`architectures/` は arch 固有実装、という責任分担を保つ。
 
 責務:
 - `PredictionRequest` (どのホライゾン・どの時刻・どのシンボル) を受け取り、
@@ -12,6 +16,9 @@
 依存方針:
 - 本ファイルは具象オーケストレータ実装に依存しない（実装はファクトリ経由でのみ参照）
 - データ層クライアントは具象実装のコンストラクタで注入する（DI）
+
+サブエージェント方式 (a01_f08_subagent) のような Python から呼べない arch は本 Protocol を
+厳密には満たさないが、出力スキーマ (`PortfolioPlan`) は共通なので eval ハーネスには乗る。
 """
 
 from __future__ import annotations

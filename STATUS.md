@@ -1,6 +1,6 @@
 # プロジェクトステータス
 
-最終更新: 2026-05-19 (architecture-first リストラ — 複数アーキテクチャを並列に試せる構造に)
+最終更新: 2026-05-21 (構造改善 — runs パス再編 / versioning / ActualOutcome / variants グローバル化 等 13 項目)
 ブランチ: `claude/plan-next-tasks-h60S6`
 
 このファイルはプロジェクトの **現状と次にやること** を一覧化する。コミットを打つたびに併せて更新する。
@@ -60,6 +60,21 @@
   - SPEC §F-08 の最終出力のうち **LLM で生成可能な部分** を担当。予測レンジ・ポイント・類似日は ML モデル側として分離
   - `horizon` は req から直接埋め、LLM に echo させない設計
   - プロンプトで「direction は最大確率と整合」「分布の和は 1.0 ±0.01」「入力に無い観点は採用しない」を制約
+
+- **構造改善（2026-05-21）— 批判的レビューを受けて 13 項目の改善を実装**
+  - 出力契約の明示化: 全 arch は `PortfolioPlan` を吐く、Python 互換 arch のみ `Orchestrator` Protocol を実装
+  - runs パス再編: `runs/<date>_<horizon>/<arch>/<scenario>/` → `runs/<fixture_id>/<horizon>/<arch>/<scenario>/<run_id>/`。fixture と run の対応が path で明示
+  - run versioning: `manifest.json` に `git_sha` / `prompts_hash` / `run_id` 追加。同じ scenario × fixture でも別 prompts_hash で並列保存可能に
+  - prompts variant をグローバル化: `src/agents/variants/<agent>/<variant>.md` に統一（arch ローカルでなく arch 横断で再利用可能）
+  - 命名統一: `fixtures/<id>/metadata.json` → `fixture.json`、`fixtures/_helpers/` → `fixtures/tools/`
+  - scenario を YAML 化: `sNN_*.json` → `sNN_*.yaml` (人手編集向上、`pyyaml` を dev deps に追加)
+  - scenario カタログ: `architectures/<arch>/scenarios/README.md` 新設
+  - `ActualOutcome` 型追加 (`src/agents/types.py`): fixture/label.json の検証用
+  - eval/reports を experiments に統合: 生スコアは `experiments/expNNN_*/scores.json` に
+  - experiments/exp001_a01_baseline_observation/ 新設: 既存 baseline run を experiment レポート化
+  - `src/graph/orchestrator.py` docstring に「具象実装は architectures/aNN/impl.py に置く」明記
+  - architectures/README.md に「src/ への依存」「外部 fork 系は subtree 推奨」セクション
+  - `.gitignore` に将来 OHLCV 増殖時の方針コメント
 
 - **architecture-first リストラ（2026-05-19）— 複数アーキテクチャ × scenario × fixture を並列に試せる構造**
   - 旧構成 `playbooks/predict.md` (シングル) → 新構成 `architectures/aNN_*/` (multiple) へ昇格
@@ -248,6 +263,7 @@
 | 2026-05-18 | `08f5b25` | `playbooks/predict.md` + `runs/` — サブエージェント実行版プロトタイプ |
 | 2026-05-19 | `914f46f` | `runs/2026-05-19_next_open/` 初回試走 (direction=bearish, P=0.60, conf=62) |
 | 2026-05-19 | `8f52609` | architecture-first リストラ: `architectures/` + `fixtures/` + `eval/` + `experiments/` 層導入、a01 マイグレート |
+| 2026-05-21 | (pending) | 構造改善 13 項目: runs パス再編 / versioning (git_sha + prompts_hash + run_id) / variants グローバル化 / YAML 化 / ActualOutcome / 命名統一 等 |
 
 ---
 

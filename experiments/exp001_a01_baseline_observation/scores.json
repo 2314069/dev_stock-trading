@@ -1,0 +1,14 @@
+{
+  "experiment_id": "exp001_a01_baseline_observation",
+  "scoring_status": "pending",
+  "reason": "fixtures/2026-05-19_macro_heavy/label.json が未作成。実際の 2026-05-19 寄付値が判明次第、eval/scorers/directional_accuracy.py などで採点する。",
+  "runs_referenced": [
+    "runs/2026-05-19_macro_heavy/next_open/a01_f08_subagent/s01_baseline/baseline_run/"
+  ],
+  "metrics_planned": [
+    "directional_accuracy",
+    "brier_score",
+    "log_loss",
+    "confidence_correlation"
+  ]
+}

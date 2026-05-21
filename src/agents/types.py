@@ -80,7 +80,19 @@ class PortfolioPlan(BaseModel):
     bear_case: str = ""
 
 
+class ActualOutcome(BaseModel):
+    """fixture の答え合わせ用。後日実際の値が判明したら埋める。eval/scorers から参照される。"""
+
+    horizon: Horizon
+    actual_direction: Literal["bullish", "neutral", "bearish"]
+    actual_open: float | None = None
+    actual_close: float | None = None
+    open_return: float | None = None
+    note: str = ""
+
+
 __all__ = [
+    "ActualOutcome",
     "DirectionProbabilities",
     "DirectionalMemo",
     "Horizon",

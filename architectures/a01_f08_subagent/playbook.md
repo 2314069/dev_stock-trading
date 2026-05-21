@@ -34,11 +34,11 @@ Claude Code の Agent ツールでサブエージェントを並列起動し、F
 
 ## 出力
 
-`runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/` 以下に成果物を保存:
+`runs/<fixture_id>/<horizon>/a01_f08_subagent/<scenario_id>/<run_id>/` 以下に成果物を保存:
 
 ```
-runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/
-  manifest.json         # 何を使ったか宣言 (arch / scenario / fixture / models)
+runs/2026-05-19_macro_heavy/next_open/a01_f08_subagent/s01_baseline/<run_id>/
+  manifest.json         # 何を使ったか宣言 (arch / scenario / fixture / git_sha / prompts_hash / run_id)
   01_news.json          # News Analyst → DirectionalMemo
   02_technical.json     # Technical Analyst → DirectionalMemo
   03_sentiment.json     # (任意) Sentiment Aggregator → DirectionalMemo
@@ -47,6 +47,9 @@ runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/
   05_plan.json          # Portfolio Manager → PortfolioPlan
   summary.md            # Claude による解説と免責
 ```
+
+`<run_id>` はタイムスタンプベース (`YYYYMMDDTHHMMSSZ`) か、特別な run には slug
+(`baseline_run` 等)。同じ scenario × fixture を別 prompts_hash で再実行できるようにする。
 
 各 JSON は対応する Pydantic スキーマ (`src/agents/types.py`) に従う。
 
@@ -59,19 +62,20 @@ runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/
 
 ### Step 0: 準備
 
-1. `mkdir -p runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/`
-2. `architectures/a01_f08_subagent/scenarios/<scenario_id>.json` を Read し
+1. `<run_id>` を決定（既定は `date +%Y%m%dT%H%M%SZ` の UTC タイムスタンプ）
+2. `mkdir -p runs/<fixture_id>/<horizon>/a01_f08_subagent/<scenario_id>/<run_id>/`
+3. `architectures/a01_f08_subagent/scenarios/<scenario_id>.yaml` を Read し
    - `params` (debate_rounds / news_split_by_category / skip_* 等) を確認
-   - `prompts` で差替指定があれば該当 `prompts/<agent>/<variant>.md` を Read
-3. 必要なソースを Read し、SYSTEM_PROMPT と入力フォーマッタを確認:
-   - `src/agents/types.py`（`DirectionalMemo` / `LabeledMemo` / `PortfolioPlan`）
+   - `prompts` で差替指定があれば該当 `src/agents/variants/<agent>/<variant>.md` を Read
+4. 必要なソースを Read し、SYSTEM_PROMPT と入力フォーマッタを確認:
+   - `src/agents/types.py`（`DirectionalMemo` / `LabeledMemo` / `PortfolioPlan` / `ActualOutcome`）
    - `src/agents/news_analyst.py`（`SYSTEM_PROMPT`, `_build_user_message`）
    - `src/agents/technical_analyst.py`
    - `src/agents/sentiment_aggregator.py`
    - `src/agents/researchers.py`（`BULL_SYSTEM_PROMPT` / `BEAR_SYSTEM_PROMPT`）
    - `src/agents/portfolio_manager.py`
-4. 既存の `runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/` がある場合は上書きの可否を
-   ユーザに確認。
+5. `prompts_hash` を計算（`src/agents/*.py` を SHA256 連結、先頭 16 桁）と `git_sha`
+   (`git rev-parse --short HEAD`) を取得し、manifest 用に控える
 
 ### Step 1: データ取得（並列で 2 つ実行、または fixture 読込）
 
@@ -147,7 +151,7 @@ runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/
   `_build_user_message()` と同じフォーマットで構築
 - **期待出力**: `DirectionalMemo` の JSON 1 つ
 - サブエージェントには「JSON のみ出力。前後に説明を付けない」と再強調
-- 結果を `runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/01_news.json` に保存（Pydantic で検証可能な形）
+- 結果を `runs/<fixture_id>/<horizon>/a01_f08_subagent/<scenario_id>/<run_id>/01_news.json` に保存（Pydantic で検証可能な形）
 
 ニュースを **カテゴリ別** に複数サブエージェントで走らせる拡張は将来。今は 1 つに統合して投入。
 
@@ -209,8 +213,22 @@ runs/2026-05-19_next_open/a01_f08_subagent/s01_baseline/
 
 ### Step 7: 報告
 
-`runs/<date>_<horizon>/a01_f08_subagent/<scenario_id>/manifest.json` を書く（arch / scenario /
-fixture / models / outputs / result_brief を宣言）。同ディレクトリの `summary.md` に以下をまとめる:
+`runs/<fixture_id>/<horizon>/a01_f08_subagent/<scenario_id>/<run_id>/manifest.json` を書く:
+
+```json
+{
+  "run_id": "...",
+  "executed_at": "ISO8601",
+  "git_sha": "<git rev-parse --short HEAD の結果>",
+  "prompts_hash": "sha256:<16 桁>",
+  "architecture": {"id": "a01_f08_subagent", ...},
+  "scenario": {"id": "...", "ref": "architectures/.../scenarios/<id>.yaml"},
+  "fixture": {"id": "...", "ref": "fixtures/<id>/"},
+  "request": {...}, "models": {...}, "outputs": {...}, "result_brief": {...}, "notes": "..."
+}
+```
+
+同ディレクトリの `summary.md` に以下をまとめる:
 
 ```markdown
 # 予測サマリ: <date> <horizon> <symbol>
@@ -249,7 +267,7 @@ fixture / models / outputs / result_brief を宣言）。同ディレクトリ�
 | やりたいこと | 操作 |
 |---|---|
 | canonical プロンプト改修 | `src/agents/<name>.py` の `SYSTEM_PROMPT` 編集（本実装と共通）→ 新 scenario で試走 |
-| プロンプトのバリアントを試す | `architectures/a01_f08_subagent/prompts/<agent>/<variant>.md` を作成 → 新 scenario の `prompts.<agent>` で参照 |
+| プロンプトのバリアントを試す | `src/agents/variants/<agent>/<variant>.md` を作成（arch 横断で再利用可）→ 新 scenario の `prompts.<agent>` で参照 |
 | フロー違いを試す | 新 scenario の `params` で `debate_rounds` / `news_split_by_category` 等を変更 |
 | 別 fixture で試す | `fixtures/<別 id>/` を指定して再実行 |
 | 別日付・別 horizon | `as_of` / `target_date` / `horizon` を変えて実行 |

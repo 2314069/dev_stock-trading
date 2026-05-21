@@ -1,6 +1,10 @@
 {
-  "run_id": "2026-05-19_next_open__a01_f08_subagent__s01_baseline",
+  "run_id": "baseline_run",
   "executed_at": "2026-05-19T00:30:00+09:00",
+  "git_sha": "914f46f",
+  "git_sha_note": "run データを最初にコミットした版 (リストラ前)。",
+  "prompts_hash": "sha256:3905164bee005566",
+  "prompts_hash_note": "src/agents/*.py 全 7 ファイルを sorted で連結して SHA256、先頭 16 桁。これはリストラ後の hash で、当時の hash は遡及修正できないため許容。",
   "executor": "Claude Code (web) — subagent-based execution",
   "architecture": {
     "id": "a01_f08_subagent",
@@ -8,7 +12,7 @@
   },
   "scenario": {
     "id": "s01_baseline",
-    "ref": "architectures/a01_f08_subagent/scenarios/s01_baseline.json"
+    "ref": "architectures/a01_f08_subagent/scenarios/s01_baseline.yaml"
   },
   "fixture": {
     "id": "2026-05-19_macro_heavy",

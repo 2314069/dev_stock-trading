@@ -1,9 +1,8 @@
 # architectures/
 
 予測パイプラインの **設計思想ごとに独立した実装** を並べるディレクトリ。各 architecture は
-`src/graph/orchestrator.py` の `Orchestrator` Protocol を満たす
-（= 何らかの形で `PredictionRequest` → `PortfolioPlan` を実現する）ことで、出力スキーマが揃い
-`eval/` で arch 横断採点が可能になる。
+**共通の出力スキーマ (`PortfolioPlan`)** を生成することで、`eval/` が arch を意識せず採点できる。
+Python から呼べる arch は加えて `src/graph/orchestrator.py` の `Orchestrator` Protocol も実装する。
 
 ## カタログ
 
@@ -19,25 +18,68 @@
 
 ## 共通契約
 
+### 出力契約（全 arch 必須）
+
 ```python
-# src/graph/orchestrator.py（既存）
+# src/agents/types.py
+class PortfolioPlan(BaseModel):
+    horizon: Horizon
+    direction: Literal["bullish", "neutral", "bearish"]
+    direction_probabilities: DirectionProbabilities
+    confidence: int
+    ...
+```
+
+すべての arch は最終出力として `PortfolioPlan` を吐く。
+保存先: `runs/<fixture_id>/<horizon>/<arch>/<scenario>/<run_id>/05_plan.json`。
+これにより `eval/scorers/` が arch を意識せず採点できる。
+
+### Python 契約（コード系 arch のみ）
+
+```python
+# src/graph/orchestrator.py
 class Orchestrator(Protocol):
     def predict(self, req: PredictionRequest) -> PortfolioPlan: ...
 ```
 
-サブエージェント方式は Python から直接呼べないが、`runs/<date>/<arch>/<scenario>/05_plan.json`
-として同じ `PortfolioPlan` スキーマで出力すれば eval ハーネスに乗る。
+Python から呼べる arch (`a02` 以降の本実装系) は加えてこの Protocol を実装する。
+a01 のような playbook 系 (人間 + サブエージェント) は Python 関数として呼べないため
+Protocol を厳密には満たさない。出力スキーマだけ揃える緩い契約。
+
+## src/ への依存
+
+各 arch は `src/` の以下を共有部品として利用:
+
+| モジュール | 役割 |
+|---|---|
+| `src/agents/<agent>.py` | プロンプト (`SYSTEM_PROMPT`) と I/O 型定義の **単一の正** |
+| `src/agents/types.py` | `DirectionalMemo` / `PortfolioPlan` / `ActualOutcome` |
+| `src/agents/variants/<agent>/<variant>.md` | プロンプト改修バリアント (arch 横断で再利用) |
+| `src/graph/orchestrator.py` | `Orchestrator` Protocol、`PredictionRequest` |
+| `src/data/` | データ層 (`NewsFetcher` / `JpxClient` 等) Protocol + スタブ |
+| `src/llm/` | LLM クライアント抽象 + runner |
+| `src/config/` | 設定管理 |
+
+arch 固有の実装は arch 配下に閉じ込め、`src/` には共有部品しか置かない。
 
 ## 新 architecture を追加するとき
 
 1. `aNN_<short_name>/` を切る
-2. `README.md`: 思想・特徴・出典・既知の制約
+2. `README.md`: 思想・特徴・出典・既知の制約・依存する src/ モジュール
 3. **実装**:
    - playbook 系 (人間 + サブエージェント実行) → `playbook.md`
-   - コード系 (Python 実装) → `impl.py` + `Orchestrator` 実装クラス
-4. `scenarios/s01_baseline.json` を最低 1 つ用意
-5. 既存 `fixtures/<id>/` で `runs/<date>/<arch>/s01_baseline/` を 1 回流す
-6. 望ましくは `experiments/expNNN_<topic>/` を切って **他 arch との比較レポート** を書く
+   - コード系 (Python 実装) → `impl.py` に `Orchestrator` 実装クラスを置く
+   - 具象実装を `src/graph/<arch>_impl.py` には **置かない** (arch 配下に閉じる)
+4. `scenarios/s01_baseline.yaml` を最低 1 つ用意
+5. `scenarios/README.md` に scenario カタログを置く
+6. 既存 `fixtures/<id>/` で `runs/<fixture>/<horizon>/<arch>/s01_baseline/<run_id>/` を 1 回流す
+7. 望ましくは `experiments/expNNN_<topic>/` を切って **他 arch との比較レポート** を書く
+
+## 外部 fork 系 arch の取り込み
+
+a03_tradingagents_fork のような外部リポジトリの取り込みは **git subtree が無難** (submodule
+だと依存先の認証や clone 順序で詰まりやすい)。`architectures/aNN_*/external/` に subtree で
+入れて、その上に薄いラッパーを書くのが推奨。
 
 ## 命名規約
 

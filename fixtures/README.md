@@ -19,10 +19,28 @@
 | `news.json` | ニュース配列 | `data.news.NewsItem` 互換 |
 | `technicals.json` | TechnicalIndicators + recent_bars | `agents.technical_analyst.TechnicalIndicators` |
 | `technicals_failed.json` | 取得失敗マーカー（technicals.json の代わり） | 自由形式 |
-| `metadata.json` | 収集日時・方法・カバー期間・データ品質メモ | 自由形式 |
-| `label.json` | 実際の翌寄付値（後日埋め、eval 用） | `{actual_open, actual_close, actual_direction}` |
+| `fixture.json` | 収集日時・方法・カバー期間・データ品質メモ | 自由形式 |
+| `label.json` | 実際の翌寄付値（後日埋め、eval 用） | `agents.types.ActualOutcome` |
 
 `technicals.json` か `technicals_failed.json` のどちらか一方が存在する。
+
+### label.json のスキーマ
+
+`src/agents/types.py` の `ActualOutcome` 型に準拠:
+
+```json
+{
+  "horizon": "next_open",
+  "actual_direction": "bearish",
+  "actual_open": 60500.0,
+  "actual_close": 60815.0,
+  "open_return": -0.0052,
+  "note": "Nikkei.co.jp 公式値より"
+}
+```
+
+`uv run python -c "from agents.types import ActualOutcome; ActualOutcome(**json.load(...))"`
+で検証可能。
 
 ## なぜ fixture を切るのか
 
@@ -38,11 +56,17 @@
 
 1. `<date>_<label>/` ディレクトリを切る
 2. `news.json` を収集（サブエージェントに WebSearch 渡す or 手動入力）
-3. `technicals.json` を計算（`_helpers/compute_indicators_yfinance.py` か手動）
-4. `metadata.json` に収集方法・期間・品質メモを記録
-5. 後日、実際の値が判明したら `label.json` を埋める（eval で参照）
+3. `technicals.json` を計算（`tools/compute_indicators_yfinance.py` か手動）
+4. `fixture.json` に収集方法・期間・品質メモを記録
+5. 後日、実際の値が判明したら `label.json` を `ActualOutcome` 形式で埋める（eval で参照）
 
-## ヘルパー
+## ヘルパー (`tools/`)
 
-- `_helpers/compute_indicators_yfinance.py`: yfinance で OHLCV を取って TechnicalIndicators を
+- `tools/compute_indicators_yfinance.py`: yfinance で OHLCV を取って TechnicalIndicators を
   計算。network allowlist で yahoo finance が通る環境で使用
+
+```bash
+uv run python fixtures/tools/compute_indicators_yfinance.py \
+  --symbol ^N225 --as-of 2026-05-18T15:15:00+09:00 --horizon next_open \
+  --out fixtures/2026-05-19_macro_heavy/technicals.json
+```

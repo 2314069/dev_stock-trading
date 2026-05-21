@@ -30,6 +30,10 @@ venv/
 *.csv
 !tests/fixtures/**/*.csv
 
+# fixtures/ 配下の大型 OHLCV は将来 git LFS or .csv 除外で対応する。
+# 現状は小さい JSON のみなので追跡。OHLCV の歴史データを直接置きたくなったら
+# fixtures/**/ohlcv*.csv のような専用パターンで管理することを検討。
+
 # Models
 models/
 *.pkl
