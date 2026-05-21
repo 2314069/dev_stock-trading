@@ -263,7 +263,7 @@
 | 2026-05-18 | `08f5b25` | `playbooks/predict.md` + `runs/` — サブエージェント実行版プロトタイプ |
 | 2026-05-19 | `914f46f` | `runs/2026-05-19_next_open/` 初回試走 (direction=bearish, P=0.60, conf=62) |
 | 2026-05-19 | `8f52609` | architecture-first リストラ: `architectures/` + `fixtures/` + `eval/` + `experiments/` 層導入、a01 マイグレート |
-| 2026-05-21 | (pending) | 構造改善 13 項目: runs パス再編 / versioning (git_sha + prompts_hash + run_id) / variants グローバル化 / YAML 化 / ActualOutcome / 命名統一 等 |
+| 2026-05-21 | `2ac1988` | 構造改善 13 項目: runs パス再編 / versioning (git_sha + prompts_hash + run_id) / variants グローバル化 / YAML 化 / ActualOutcome / 命名統一 等 |
 
 ---
 
